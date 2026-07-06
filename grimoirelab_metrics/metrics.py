@@ -126,7 +126,7 @@ class GitEventsAnalyzer:
         """
         from_month = self.from_date.replace(day=1)
         to_month = self.to_date.replace(day=1)
-        
+
         while from_month <= to_month:
             month_key = from_month.strftime("%Y-%m")
             self.commits_per_month[month_key] = 0
@@ -248,9 +248,9 @@ class GitEventsAnalyzer:
 
     def get_commit_coefficient_of_variation(self):
         """
-        Get the coefficient of variation (mean) of the number of commits 
+        Get the coefficient of variation (mean) of the number of commits
         per month.
-        
+
         NEXT: The only interval so far coded is monthly. Is that correct?
         """
 
@@ -419,13 +419,13 @@ class GitEventsAnalyzer:
 
         if days_interval <= 90:
             self.recent_commits += 1
-        
+
         # Update commits per month
-        #try: ##FIXME
+        # try: ##FIXME
         month_key = commit_date.strftime("%Y-%m")
         self.commits_per_month[month_key] += 1
-        ##except (ValueError, TypeError, InvalidDateError):
-        ##pass
+        # #except (ValueError, TypeError, InvalidDateError):
+        # #pass
 
     def _update_contributors(self, event_data):
         author = event_data[AUTHOR_FIELD]

@@ -26,7 +26,6 @@ import re
 import sys
 import time
 import typing
-from urllib import response
 
 import click
 import requests
@@ -363,10 +362,10 @@ def repository_ready(grimoirelab_client: GrimoireLabClient, repository: str, aft
 
     repo_data = r.json()
     print(repo_data)
-    
+
     if not repo_data.get("results"):
         logging.warning(f"Repository '{repository}' not found in project")
-        return False    
+        return False
 
     categories = repo_data["results"][0].get("categories", [])
     if not categories:
@@ -414,10 +413,10 @@ def schedule_repository(grimoirelab_client: GrimoireLabClient, uri: str, datasou
     project = "npm-popular-components"
 
     endpoint = f"api/v1/ecosystems/{ecosystem}/projects/{project}/repos/"
-    
+
     try:
         res = grimoirelab_client.post(endpoint, json=data)
-        res.raise_for_status()        
+        res.raise_for_status()
     except requests.HTTPError as e:
         if e.response is not None and e.response.status_code == 422:
             try:
@@ -428,9 +427,8 @@ def schedule_repository(grimoirelab_client: GrimoireLabClient, uri: str, datasou
             logging.info(f"Repository {data.get('uri')} is already registered. Skipping.")
             res = e.response
         else:
-            # If it's a different HTTP error (500, 404, 403) we re-raise it
-            raise e      
-        
+            # If it's a different HTTP error (500, 404, 403), re-raise it
+            raise e
 
 
 if __name__ == "__main__":
