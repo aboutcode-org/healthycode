@@ -301,12 +301,12 @@ class GitEventsAnalyzer:
         return len(self.recent_organizations)
 
     def get_recent_contributors(self):
-        """Return the number of contributors from the last 90d."""
+        """Return the number of contributors from the last 365d."""
 
         return len(self.recent_contributors)
 
     def get_recent_commits(self) -> int:
-        """Return the number of commits in the last 90d."""
+        """Return the number of commits in the last 365d."""
 
         return self.recent_commits
 
@@ -417,7 +417,7 @@ class GitEventsAnalyzer:
         except (ValueError, TypeError, InvalidDateError):
             return
 
-        if days_interval <= 90:
+        if days_interval <= 365:
             self.recent_commits += 1
 
         # Update commits per month
@@ -448,7 +448,7 @@ class GitEventsAnalyzer:
         # Update contributors by period
         if commit_date:
             days_interval = (self.to_date - commit_date).days
-            if days_interval <= 90:
+            if days_interval <= 365:
                 self.recent_contributors.add(author)
                 self.returning_contributors["second_period"].add(author)
             else:
@@ -470,7 +470,7 @@ class GitEventsAnalyzer:
         except (ValueError, TypeError, InvalidDateError):
             pass
         else:
-            if days_interval <= 90:
+            if days_interval <= 365:
                 self.recent_organizations.add(organization)
 
     def _update_file_metrics(self, event):
