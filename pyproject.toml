@@ -17,7 +17,7 @@ python = "^3.11"
 spdx-tools = "^0.8.3"
 click = "^8.1.8"
 requests = "^2.32.3"
-opensearch-py = "^2.8.0"
+opensearch-py = "^3.0.0"
 grimoirelab-toolkit = {git = "https://github.com/chaoss/grimoirelab-toolkit.git", allow-prereleases = true}
 
 [tool.poetry.group.dev]
