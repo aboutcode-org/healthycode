@@ -3,7 +3,7 @@
 Client to generate GrimoireLab metrics for Project Health using the
 software analytics platform [GrimoireLab](https://github.com/chaoss/grimoirelab).
 
-![grimoirelab_metrics_schema.jpg](images/grimoirelab_metrics_schema.jpg)
+![grimoirelab_metrics_schema.jpg](docs/images/grimoirelab_metrics_schema.jpg)
 
 ## Installation
 

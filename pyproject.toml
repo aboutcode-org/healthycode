@@ -3,11 +3,12 @@ name = "grimoirelab-metrics"
 version = "0.1.0"
 description = ""
 authors = [
-    "Bitergia Developers"
+    "Bitergia Developers",
+    "AboutCode"
 ]
 license = "GPL-3.0+"
 readme = "README.md"
-packages = [{include = "grimoirelab_metrics"}]
+packages = [{include = "grimoirelab_metrics", from = "src"}]
 
 [tool.poetry.scripts]
 grimoirelab-metrics = "grimoirelab_metrics.cli:grimoirelab_metrics"
