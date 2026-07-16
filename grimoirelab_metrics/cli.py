@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) Bitergia
+# Copyright (C) AboutCode
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,6 +26,7 @@ import re
 import sys
 import time
 import typing
+from urllib import response
 
 import click
 import requests
@@ -210,7 +212,9 @@ def get_repository(download_location: str) -> str | None:
     if is_valid(download_location):
         git_regex = re.search(GIT_REPO_REGEX, download_location)
         if git_regex:
-            uri = f"https://{git_regex.group(5)}"
+            #uri = f"https://{git_regex.group(5)}"
+            #FIXME review this code
+            uri = f"https://{git_regex.group(5)}.git"
             return uri
     return None
 
@@ -296,7 +300,7 @@ def generate_metrics_when_ready(
 
     limit_time = time.time() + timeout
 
-    after_date = datetime.datetime.now(datetime.UTC) - datetime.timedelta(days=7)
+    after_date = datetime.datetime.now(datetime.UTC) - datetime.timedelta(days=30)
     pending_repositories = set(repositories)
     metrics = {"repositories": {}}
 
@@ -346,15 +350,29 @@ def repository_ready(grimoirelab_client: GrimoireLabClient, repository: str, aft
     :param repository: Repository URI
     :param after_date: Date to check if the task has finished
     """
+    #FIXME hardcoded parameters
+    ecosystem ="npm-training-set"
+    project = "npm-popular-components"
+
+    endpoint = f"api/v1/ecosystems/{ecosystem}/projects/{project}/repos/"
     try:
-        r = grimoirelab_client.get("/datasources/repositories/", params={"uri": repository})
+        r = grimoirelab_client.get(endpoint, params={"uri": repository})
     except requests.HTTPError as e:
         logging.warning(f"Error checking repository status: {e}")
         return False
 
     repo_data = r.json()
+    print(repo_data)
+    
+    if not repo_data.get("results"):
+        logging.warning(f"Repository '{repository}' not found in project")
+        return False    
 
-    task = repo_data["results"][0]["task"]
+    categories = repo_data["results"][0].get("categories", [])
+    if not categories:
+        return False
+    
+    task = categories[0].get("task")
     if task["status"] == "failed":
         logging.warning(f"Metrics for '{repository}' might be incomplete")
         return True
@@ -378,22 +396,41 @@ def schedule_repository(grimoirelab_client: GrimoireLabClient, uri: str, datasou
     :param uri: Repository URI.
     :param datasource: Data source type.
     :param category: Data source category.
+    :param ecosystem: Ecosystem name.
+    :param project: Project name.
 
     :return: Scheduled task.
     """
+    #FIXME clarify parameters
     data = {
         "uri": uri,
         "datasource_type": datasource,
         "datasource_category": category,
+        "category": category
     }
+
+    #FIXME hardcoded parameters
+    ecosystem ="npm-training-set"
+    project = "npm-popular-components"
+
+    endpoint = f"api/v1/ecosystems/{ecosystem}/projects/{project}/repos/"
+    
     try:
-        res = grimoirelab_client.post("datasources/add_repository", json=data)
-        res.raise_for_status()
+        res = grimoirelab_client.post(endpoint, json=data)
+        res.raise_for_status()        
     except requests.HTTPError as e:
-        if res.status_code == 405 and "already exists" in res.json()["error"]:
-            pass
+        if e.response is not None and e.response.status_code == 422:
+            try:
+                logging.debug("DEBUG - Validation Error Details:", e.response.text) #json())
+            except ValueError:
+                logging.debug("DEBUG - Validation Error Details (Text):", e.response.text)
+                
+            logging.info(f"Repository {data.get('uri')} is already registered. Skipping.")
+            res = e.response
         else:
-            raise e
+            # If it's a different HTTP error (500, 404, 403) we re-raise it
+            raise e      
+        
 
 
 if __name__ == "__main__":
