@@ -211,8 +211,6 @@ def get_repository(download_location: str) -> str | None:
     if is_valid(download_location):
         git_regex = re.search(GIT_REPO_REGEX, download_location)
         if git_regex:
-            #uri = f"https://{git_regex.group(5)}"
-            #FIXME review this code
             uri = f"https://{git_regex.group(5)}.git"
             return uri
     return None
@@ -404,32 +402,62 @@ def schedule_repository(grimoirelab_client: GrimoireLabClient, uri: str, datasou
     data = {
         "uri": uri,
         "datasource_type": datasource,
-        "datasource_category": category,
-        "category": category
+        "category": category,
+        "scheduler": {
+            "job_interval": 86400,
+            "job_max_retries": 3,
+            "force_run": False
+        }
     }
 
     #FIXME hardcoded parameters
     ecosystem ="npm-training-set"
     project = "npm-popular-components"
 
-    endpoint = f"api/v1/ecosystems/{ecosystem}/projects/{project}/repos/"
 
+    if is_added(grimoirelab_client, uri): return True
+
+    endpoint = f"api/v1/ecosystems/{ecosystem}/projects/{project}/repos/"
     try:
         res = grimoirelab_client.post(endpoint, json=data)
         res.raise_for_status()
     except requests.HTTPError as e:
         if e.response is not None and e.response.status_code == 422:
-            try:
-                logging.debug("DEBUG - Validation Error Details:", e.response.text) #json())
-            except ValueError:
-                logging.debug("DEBUG - Validation Error Details (Text):", e.response.text)
-                
+            logging.debug(f"payload:{data}")
+            logging.debug("DEBUG - Validation Error Details:", e.response.text)
             logging.info(f"Repository {data.get('uri')} is already registered. Skipping.")
             res = e.response
         else:
             # If it's a different HTTP error (500, 404, 403), re-raise it
             raise e
 
+def is_added(grimoirelab_client: GrimoireLabClient, uri: str) -> bool:
+    """Check if the repository is already scheduled"""
+
+    #FIXME hardcoded parameters
+    ecosystem ="npm-training-set"
+    project = "npm-popular-components"
+
+    endpoint = f"api/v1/ecosystems/{ecosystem}/projects/{project}/repos/"
+    params = {"uri": uri}
+
+    try:
+        res = grimoirelab_client.get(endpoint, params=params)
+        res.raise_for_status()
+    except requests.HTTPError as e:
+        raise e
+
+    data = res.json()
+    count_value = data["count"]
+
+    if count_value > 0:
+        uri_value = data["results"][0]["uri"]
+        last_run = data["results"][0]["categories"][-1]["task"]["last_run"]
+        logging.warning(f"Repository {uri_value} already added. Last run on {last_run}")
+        return True
+
+    else:
+        return False
 
 if __name__ == "__main__":
     grimoirelab_metrics()
