@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) Bitergia
+# Copyright (C) AboutCode
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,6 +21,7 @@ from __future__ import annotations
 
 import datetime
 import logging
+import numpy
 import re
 import typing
 
@@ -114,6 +116,25 @@ class GitEventsAnalyzer:
         self.active_branches: set = set()
         self._half_period = self.from_date + (self.to_date - self.from_date) / 2
         self.files_found: dict[str, int] = {"license": 0, "adopters": 0}
+        self.commits_per_month: Counter = Counter()
+        self._initialize_months()
+
+    def _initialize_months(self):
+        """Initialize commits_per_month with all months in the date range, starting at 0.
+
+        We need this for the calculation of the coefficient of variability
+        """
+        from_month = self.from_date.replace(day=1)
+        to_month = self.to_date.replace(day=1)
+        
+        while from_month <= to_month:
+            month_key = from_month.strftime("%Y-%m")
+            self.commits_per_month[month_key] = 0
+            # Move to next month
+            if from_month.month == 12:
+                from_month = from_month.replace(year=from_month.year + 1, month=1)
+            else:
+                from_month = from_month.replace(month=from_month.month + 1)
 
     def process_events(self, events: iter(dict[str, Any])):
         for event in events:
@@ -224,6 +245,27 @@ class GitEventsAnalyzer:
             metrics["year"] = self.total_commits / (days_interval / 365)
 
         return metrics
+
+    def get_commit_coefficient_of_variation(self):
+        """
+        Get the coefficient of variation (mean) of the number of commits 
+        per month.
+        
+        NEXT: The only interval so far coded is monthly. Is that correct?
+        """
+
+        commits_list = list(self.commits_per_month.values())
+        print(str(commits_list))
+        mean = numpy.mean(commits_list)
+        print(mean)
+        stdev = numpy.std(commits_list)
+        print(stdev)
+        try:
+            cv = stdev / mean
+        except ZeroDivisionError as e:
+            return 0.0
+
+        return cv
 
     def get_developer_categories(self):
         """Return the number of core, regular and casual developers"""
@@ -377,6 +419,13 @@ class GitEventsAnalyzer:
 
         if days_interval <= 90:
             self.recent_commits += 1
+        
+        # Update commits per month
+        #try: ##FIXME
+        month_key = commit_date.strftime("%Y-%m")
+        self.commits_per_month[month_key] += 1
+        ##except (ValueError, TypeError, InvalidDateError):
+        ##pass
 
     def _update_contributors(self, event_data):
         author = event_data[AUTHOR_FIELD]
@@ -631,6 +680,7 @@ def get_repository_metrics(
     metrics["metrics"]["casual_regular_contributors_rate"] = analyzer.get_casual_regular_contributors_rate()
     metrics["metrics"]["returning_contributors"] = analyzer.get_returning_contributors()
     metrics["metrics"]["commits_over_periods_rate"] = analyzer.get_commits_over_periods_rate()
+    metrics["metrics"]["coefficient_of_variation"] = analyzer.get_commit_coefficient_of_variation()
 
     if from_date and to_date:
         days = (to_date - from_date).days
