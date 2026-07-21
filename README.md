@@ -124,6 +124,8 @@ project vulnerable if they were to leave.
 
 *Also known as: Lottery Factor, Bus Factor, Contributor Absence Factor.*
 
+CHAOSS definition of the [Contributor Abscence Factor](https://www.chaoss.community/kb/metric-contributor-absence-factor/).
+
 ### Elephant factor
 
 The metric is defined as the number of unique organizations producing up to the
@@ -136,6 +138,8 @@ Pony Factor metric and takes it to contributing Organizations.
 Contributions are focused on Git commits, and the organization
 is determined by the email address of the commit author.
 
+CHAOSS definition of the [Elephant Factor](https://www.chaoss.community/kb/metric-elephant-factor/).
+
 ### Number of contributing organizations
 
 This metric quantifies the total number of distinct organizations whose members
@@ -143,6 +147,8 @@ have made contributions to an open source project over a specified period.
 
 Contributions are focused on Git commits, and the organization
 is determined by the email address of the commit author.
+
+CHAOSS definition of the [Organizational Diversity](https://www.chaoss.community/kb/metric-organizational-diversity/).
 
 ### Number of organizations contributing recently
 
@@ -152,15 +158,25 @@ actively made contributions to an open source project within the last 90 days.
 Contributions are focused on Git commits, and the organization
 is determined by the email address of the commit author.
 
+CHAOSS definition of the [Organizational Diversity](https://www.chaoss.community/kb/metric-organizational-diversity/)
+filtered by a specific timeframe.
+
 ### Number of recent contributors
 
 This metric quantifies the total count of unique individuals who contributed
 within the last 90 days.
 
+CHAOSS definition of [Contributors](https://www.chaoss.community/kb/metric-contributors/) filtered by a
+specific timeframe.
+
+
 ### Number of recent commits
 
 This metric counts the total number of commits made to the project within the
 last 90 days.
+
+CHAOSS definition of [Code Changes Commits](https://www.chaoss.community/kb/metric-code-changes-commits/) filtered by
+the last 90 days.
 
 ### Contributor Growth Rate
 
@@ -197,10 +213,15 @@ This metric refers to the count of branches within a project's version control
 repository (for this case, Git) that have seen recent development activity,
 usually indicated by new commits.
 
+CHAOSS definition of [Branch Lifecycle](https://www.chaoss.community/kb/metric-branch-lifecycle/).
+
 ### Days since last commit
 
 This metric shows the number of days since the last commit was submitted to the
 repository or the project.
+
+CHAOSS definition of [Code Changes Commits](https://www.chaoss.community/kb/metric-code-changes-commits/) 
+taking into account the last commit activity.
 
 ### Presence of an adopters file in a standard location
 
@@ -220,6 +241,8 @@ Standard practice dictates that this file is named `LICENSE`, `LICENSE.md`,
 `LICENSE.txt`, or `COPYING` (a convention historically used by GNU projects)
 and is located in the root directory of the project's source code repository.
 
+CHAOSS definition of [License Declared](https://www.chaoss.community/kb/metric-licenses-declared/).
+
 ### Rate of contributors contributing infrequently vs. regularly
 
 This metric involves categorizing contributors based on the frequency,
@@ -228,7 +251,8 @@ to distinguish between individuals who contribute episodically
 (infrequent contributors) and those who engage with the project consistently
 and often substantially (regular or core contributors).
 
-The CHAOSS community, for instance, defines "Occasional Contributors" as
+The CHAOSS community, for instance, defines
+"[Occasional Contributors](https://www.chaoss.community/kb/metric-occasional-contributors/)" as
 "people who make contributions to a project on an irregular basis".
 
 ### Number of contributors who have contributed in previous periods
