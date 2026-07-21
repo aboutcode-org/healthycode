@@ -268,12 +268,41 @@ This metrics calculates the rate of commits between the last 90 days and
 the last year. The purpose of this metrics is having an estimation of how
 distributed contributions are, and the "momentum" of the project.
 
-### Other metrics
+### Number of commits per repository
 
-- Number of commits per repository
-- Number of developers per repository
-- File type metrics (code, binaries or other)
-- Commit side metrics (added lines and removed lines)
-- Message size metrics (total, mean and median)
-- Frequency metrics for commits (week, month and year)
-- Developer categories (core, regular and casual)
+Activity for each of the Git repositories analyzed.
+
+CHAOSS definition of [Code Changes Commits](https://www.chaoss.community/kb/metric-code-changes-commits/) filtered
+by repository.
+
+### Number of developers per repository
+
+Unique participants producing commits in a given repository.
+
+CHAOSS definition of [Contributors](https://www.chaoss.community/kb/metric-contributors/) filtered
+by repository.
+
+### File type metrics (code, documentation, or others)
+
+Type of activity done by developers, mainly split into code, documentation, and others.
+
+### Commit size metrics (added and removed lines)
+
+This provides an overview of the usual size of the code review processes and good practices
+when submitting code.
+
+CHAOSS uses the metric [Change Request Commits](https://www.chaoss.community/kb/metric-change-request-commits/)
+as a way to use this as a filter.
+
+### Message size metrics (total, mean, and median)
+
+This metrics provides information about how extensive a developer is providing information about the
+change in the commit.
+
+### Frequency metrics for commits
+
+This allows to understand the consistency of developers when producing code.
+
+### Developer categories (core, regular and casual)
+
+This metric structures the developers by their activity and consistency. The core developers produce
