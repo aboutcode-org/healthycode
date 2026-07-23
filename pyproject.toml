@@ -20,6 +20,7 @@ click = "^8.1.8"
 requests = "^2.32.3"
 opensearch-py = "^3.0.0"
 grimoirelab-toolkit = {git = "https://github.com/chaoss/grimoirelab-toolkit.git", allow-prereleases = true}
+numpy = "<2.5.0"
 
 [tool.poetry.group.dev]
 optional = true
