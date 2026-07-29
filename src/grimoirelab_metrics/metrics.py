@@ -261,6 +261,8 @@ class GitEventsAnalyzer:
         stdev = numpy.std(commits_list)
         print(stdev)
         try:
+            # we need the line below because of numpy
+            if mean == 0: raise ZeroDivisionError
             cv = stdev / mean
         except ZeroDivisionError as e:
             return 0.0
