@@ -368,7 +368,7 @@ class GitEventsAnalyzer:
         """Return the number of days since the last commit."""
 
         if not self.last_commit_date:
-            return None
+            return 99999
 
         days_since_last_commit = (self.to_date - self.last_commit_date).days
 
