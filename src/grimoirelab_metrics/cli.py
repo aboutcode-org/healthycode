@@ -36,6 +36,7 @@ from spdx_tools.spdx.model import SpdxNone, SpdxNoAssertion
 from spdx_tools.spdx.parser.error import SPDXParsingError
 from spdx_tools.spdx.parser.parse_anything import parse_file
 
+from grimoirelab_metrics.metrics_model import npmModel
 from grimoirelab_metrics.grimoirelab_client import GrimoireLabClient
 from grimoirelab_metrics.metrics import get_repository_metrics, FILE_TYPE_CODE, FILE_TYPE_BINARY
 
@@ -176,10 +177,13 @@ def grimoirelab_metrics(
         )
 
         package_metrics = {"packages": {}}
+        npm_metrics_model = npmModel()
         for package, repo in packages.items():
             if repo and repo in metrics["repositories"]:
                 package_metrics["packages"][package] = metrics["repositories"][repo]
                 package_metrics["packages"][package]["repository"] = repo
+                unhealthy_score = npm_metrics_model.calculate_score(metrics["repositories"][repo]["metrics"])
+                package_metrics["packages"][package]["score"] = unhealthy_score
             else:
                 package_metrics["packages"][package] = {"metrics": None}
 
