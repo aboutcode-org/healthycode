@@ -22,6 +22,7 @@ from __future__ import annotations
 import datetime
 import json
 import logging
+import os
 import re
 import sys
 import time
@@ -32,6 +33,7 @@ import requests
 
 from importlib.metadata import version
 
+from pathlib import Path
 from spdx_tools.spdx.model import SpdxNone, SpdxNoAssertion
 from spdx_tools.spdx.parser.error import SPDXParsingError
 from spdx_tools.spdx.parser.parse_anything import parse_file
@@ -51,7 +53,7 @@ DEFAULT_ELEPHANT_THRESHOLD = 0.5
 
 
 @click.command()
-@click.argument("filename")
+@click.argument("source")
 @click.option(
     "--grimoirelab-url",
     help="GrimoireLab URL server",
@@ -104,7 +106,7 @@ DEFAULT_ELEPHANT_THRESHOLD = 0.5
     default=DEFAULT_DEV_CATEGORIES_THRESHOLDS,
 )
 def grimoirelab_metrics(
-    filename: str,
+    source: str,
     grimoirelab_url: str,
     grimoirelab_user: str,
     grimoirelab_password: str,
@@ -126,16 +128,16 @@ def grimoirelab_metrics(
     elephant_threshold: float = DEFAULT_ELEPHANT_THRESHOLD,
     dev_categories_thresholds: tuple[float, float] = DEFAULT_DEV_CATEGORIES_THRESHOLDS,
 ) -> None:
-    """Calculate metrics using GrimoireLab.
+    """Calculate metrics and the npm health score using GrimoireLab.
 
-    Given a SPDX SBOM file with git repositories as input, this tool will generate
-    a set of Project Health metrics. These metrics are calculated using the data
-    stored on GrimoireLab about those repositories.
+    This tools generates a sets of project health metrics and a score using a
+    npm health model. As input it either receives a remote Git repository or a 
+    local SPDX SBOM file with git repositories. The data collection is scheduled
+    by GrimoireLab and the health score is calculated on the fly.
 
-    If any of the listed repositories is not available on GrimoireLab, the tool
-    will add it to GrimoireLab to have it analyzed.
+    The health score goes from 0 (healthy) to 1 (unhealthy).
 
-    FILENAME: SPDX SBoM file with git repositories
+    SOURCE: remote git repository or SPDX SBoM file with git repositories
     """
     log_level = "DEBUG" if verbose else "INFO"
     logging.basicConfig(level=log_level, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -145,8 +147,18 @@ def grimoirelab_metrics(
         grimoirelab_client = GrimoireLabClient(grimoirelab_url, grimoirelab_user, grimoirelab_password, verify_certs)
         grimoirelab_client.connect()
 
-        packages = get_sbom_packages(filename)
-        git_urls = list(set(repo for repo in packages.values() if is_valid(repo)))
+        if is_sbom_file(source):
+            logging.debug(f"Source is a filepath: {source}")
+            packages = get_sbom_packages(source)
+            git_urls = list(set(repo for repo in packages.values() if is_valid(repo)))
+        elif is_git_repository(source):
+            logging.debug(f"Source is a Git repository: {source}")
+            packages =  {"package0": source}
+            git_urls = [source]
+        else:
+            logging.debug(f"Source is a not either a filepath or Git repository: {source}. Exiting ...")
+            print("The source is not a file and does not end with .git ...")
+            sys.exit(0)
 
         if len(git_urls) > 0:
             logging.info(f"Found {len(git_urls)} git repositories")
@@ -210,6 +222,13 @@ def grimoirelab_metrics(
         logging.error(e)
         sys.exit(1)
 
+def is_git_repository(value: str) -> bool:
+    """Return True if value looks like a Git repository URL."""
+    return re.match(GIT_REPO_REGEX, value) is not None
+
+def is_sbom_file(value: str) -> bool:
+    """Return True if value is an existing file."""
+    return Path(value).is_file()
 
 def get_repository(download_location: str) -> str | None:
     if is_valid(download_location):
