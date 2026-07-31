@@ -22,6 +22,7 @@ from __future__ import annotations
 import datetime
 import json
 import logging
+import os
 import re
 import sys
 import time
@@ -32,10 +33,12 @@ import requests
 
 from importlib.metadata import version
 
+from pathlib import Path
 from spdx_tools.spdx.model import SpdxNone, SpdxNoAssertion
 from spdx_tools.spdx.parser.error import SPDXParsingError
 from spdx_tools.spdx.parser.parse_anything import parse_file
 
+from grimoirelab_metrics.metrics_model import npmModel
 from grimoirelab_metrics.grimoirelab_client import GrimoireLabClient
 from grimoirelab_metrics.metrics import get_repository_metrics, FILE_TYPE_CODE, FILE_TYPE_BINARY
 
@@ -50,7 +53,7 @@ DEFAULT_ELEPHANT_THRESHOLD = 0.5
 
 
 @click.command()
-@click.argument("filename")
+@click.argument("source")
 @click.option(
     "--grimoirelab-url",
     help="GrimoireLab URL server",
@@ -103,7 +106,7 @@ DEFAULT_ELEPHANT_THRESHOLD = 0.5
     default=DEFAULT_DEV_CATEGORIES_THRESHOLDS,
 )
 def grimoirelab_metrics(
-    filename: str,
+    source: str,
     grimoirelab_url: str,
     grimoirelab_user: str,
     grimoirelab_password: str,
@@ -125,16 +128,16 @@ def grimoirelab_metrics(
     elephant_threshold: float = DEFAULT_ELEPHANT_THRESHOLD,
     dev_categories_thresholds: tuple[float, float] = DEFAULT_DEV_CATEGORIES_THRESHOLDS,
 ) -> None:
-    """Calculate metrics using GrimoireLab.
+    """Calculate metrics and the npm health score using GrimoireLab.
 
-    Given a SPDX SBOM file with git repositories as input, this tool will generate
-    a set of Project Health metrics. These metrics are calculated using the data
-    stored on GrimoireLab about those repositories.
+    This tools generates a sets of project health metrics and a score using a
+    npm health model. As input it either receives a remote Git repository or a 
+    local SPDX SBOM file with git repositories. The data collection is scheduled
+    by GrimoireLab and the health score is calculated on the fly.
 
-    If any of the listed repositories is not available on GrimoireLab, the tool
-    will add it to GrimoireLab to have it analyzed.
+    The health score goes from 0 (healthy) to 1 (unhealthy).
 
-    FILENAME: SPDX SBoM file with git repositories
+    SOURCE: remote git repository or SPDX SBoM file with git repositories
     """
     log_level = "DEBUG" if verbose else "INFO"
     logging.basicConfig(level=log_level, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -144,8 +147,18 @@ def grimoirelab_metrics(
         grimoirelab_client = GrimoireLabClient(grimoirelab_url, grimoirelab_user, grimoirelab_password, verify_certs)
         grimoirelab_client.connect()
 
-        packages = get_sbom_packages(filename)
-        git_urls = list(set(repo for repo in packages.values() if is_valid(repo)))
+        if is_sbom_file(source):
+            logging.debug(f"Source is a filepath: {source}")
+            packages = get_sbom_packages(source)
+            git_urls = list(set(repo for repo in packages.values() if is_valid(repo)))
+        elif is_git_repository(source):
+            logging.debug(f"Source is a Git repository: {source}")
+            packages =  {"package0": source}
+            git_urls = [source]
+        else:
+            logging.debug(f"Source is a not either a filepath or Git repository: {source}. Exiting ...")
+            print("The source is not a file and does not end with .git ...")
+            sys.exit(0)
 
         if len(git_urls) > 0:
             logging.info(f"Found {len(git_urls)} git repositories")
@@ -176,10 +189,14 @@ def grimoirelab_metrics(
         )
 
         package_metrics = {"packages": {}}
+        npm_metrics_model = npmModel()
         for package, repo in packages.items():
             if repo and repo in metrics["repositories"]:
                 package_metrics["packages"][package] = metrics["repositories"][repo]
                 package_metrics["packages"][package]["repository"] = repo
+                logging.debug(f"Score calculated for {repo}")
+                unhealthy_score = npm_metrics_model.calculate_score(metrics["repositories"][repo]["metrics"])
+                package_metrics["packages"][package]["score"] = unhealthy_score
             else:
                 package_metrics["packages"][package] = {"metrics": None}
 
@@ -197,8 +214,8 @@ def grimoirelab_metrics(
             "elephant_threshold": elephant_threshold,
             "dev_categories_thresholds": dev_categories_thresholds,
         }
-
         output.write(json.dumps(package_metrics, indent=4))
+        logging.info(f"Metrics and scores are calculated and written to file \"{output.name}\"")
     except SPDXParsingError as e:
         logging.error(e.messages[0])
         sys.exit(1)
@@ -206,6 +223,13 @@ def grimoirelab_metrics(
         logging.error(e)
         sys.exit(1)
 
+def is_git_repository(value: str) -> bool:
+    """Return True if value looks like a Git repository URL."""
+    return re.match(GIT_REPO_REGEX, value) is not None
+
+def is_sbom_file(value: str) -> bool:
+    """Return True if value is an existing file."""
+    return Path(value).is_file()
 
 def get_repository(download_location: str) -> str | None:
     if is_valid(download_location):
@@ -244,7 +268,7 @@ def schedule_repositories(repositories: list[str], grimoirelab_client: GrimoireL
     :param repositories: List of git repositories.
     :param grimoirelab_client: GrimoireLab API client.
     """
-    logging.info("Scheduling tasks")
+    logging.info("Scheduling data collection tasks with GrimoireLab")
     for package_url in repositories:
         logging.debug(f"Scheduling task to fetch commits from {package_url}")
         try:
@@ -293,7 +317,6 @@ def generate_metrics_when_ready(
     :param elephant_threshold: Elephant Factor threshold.
     :param dev_categories_thresholds: Developer Categories thresholds.
     """
-    logging.info("Generating metrics")
 
     limit_time = time.time() + timeout
 
@@ -331,6 +354,7 @@ def generate_metrics_when_ready(
             logging.debug(f"Repositories not ready: {pending_repositories}")
             time.sleep(25)
         else:
+            logging.info(f"Data collection finished for {len(processed)}/{len(repositories)} repositories")
             break
 
     for repository in pending_repositories:
@@ -359,7 +383,6 @@ def repository_ready(grimoirelab_client: GrimoireLabClient, repository: str, aft
         return False
 
     repo_data = r.json()
-    print(repo_data)
 
     if not repo_data.get("results"):
         logging.warning(f"Repository '{repository}' not found in project")
@@ -371,7 +394,7 @@ def repository_ready(grimoirelab_client: GrimoireLabClient, repository: str, aft
     
     task = categories[0].get("task")
     if task["status"] == "failed":
-        logging.warning(f"Metrics for '{repository}' might be incomplete")
+        logging.warning(f"Data for '{repository}' might be incomplete, its last execution failed")
         return True
     elif task["last_run"]:
         last_run_dt = datetime.datetime.fromisoformat(task["last_run"])
@@ -453,7 +476,7 @@ def is_added(grimoirelab_client: GrimoireLabClient, uri: str) -> bool:
     if count_value > 0:
         uri_value = data["results"][0]["uri"]
         last_run = data["results"][0]["categories"][-1]["task"]["last_run"]
-        logging.warning(f"Repository {uri_value} already added. Last run on {last_run}")
+        logging.debug(f"Repository {uri_value} already added. Last run on {last_run}")
         return True
 
     else:

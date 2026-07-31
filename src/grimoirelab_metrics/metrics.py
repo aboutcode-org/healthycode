@@ -255,12 +255,11 @@ class GitEventsAnalyzer:
         """
 
         commits_list = list(self.commits_per_month.values())
-        print(str(commits_list))
         mean = numpy.mean(commits_list)
-        print(mean)
         stdev = numpy.std(commits_list)
-        print(stdev)
         try:
+            # we need the line below because of numpy
+            if mean == 0: raise ZeroDivisionError
             cv = stdev / mean
         except ZeroDivisionError as e:
             return 0.0
@@ -366,7 +365,7 @@ class GitEventsAnalyzer:
         """Return the number of days since the last commit."""
 
         if not self.last_commit_date:
-            return None
+            return 99999
 
         days_since_last_commit = (self.to_date - self.last_commit_date).days
 
@@ -616,6 +615,9 @@ def get_repository_metrics(
     :param elephant_threshold: Threshold for the elephant factor
     :param dev_categories_thresholds: Threshold for the developer categories
     """
+
+    logging.debug(f"Collecting data and generating metrics for {repository}")
+
     os_conn = connect_to_opensearch(
         url=opensearch_url,
         username=opensearch_user,
