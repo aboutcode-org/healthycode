@@ -194,6 +194,7 @@ def grimoirelab_metrics(
             if repo and repo in metrics["repositories"]:
                 package_metrics["packages"][package] = metrics["repositories"][repo]
                 package_metrics["packages"][package]["repository"] = repo
+                logging.debug(f"Score calculated for {repo}")
                 unhealthy_score = npm_metrics_model.calculate_score(metrics["repositories"][repo]["metrics"])
                 package_metrics["packages"][package]["score"] = unhealthy_score
             else:
@@ -213,8 +214,8 @@ def grimoirelab_metrics(
             "elephant_threshold": elephant_threshold,
             "dev_categories_thresholds": dev_categories_thresholds,
         }
-
         output.write(json.dumps(package_metrics, indent=4))
+        logging.info(f"Metrics and scores are calculated and written to file \"{output.name}\"")
     except SPDXParsingError as e:
         logging.error(e.messages[0])
         sys.exit(1)
@@ -267,7 +268,7 @@ def schedule_repositories(repositories: list[str], grimoirelab_client: GrimoireL
     :param repositories: List of git repositories.
     :param grimoirelab_client: GrimoireLab API client.
     """
-    logging.info("Scheduling tasks")
+    logging.info("Scheduling data collection tasks with GrimoireLab")
     for package_url in repositories:
         logging.debug(f"Scheduling task to fetch commits from {package_url}")
         try:
@@ -316,7 +317,6 @@ def generate_metrics_when_ready(
     :param elephant_threshold: Elephant Factor threshold.
     :param dev_categories_thresholds: Developer Categories thresholds.
     """
-    logging.info("Generating metrics")
 
     limit_time = time.time() + timeout
 
@@ -354,6 +354,7 @@ def generate_metrics_when_ready(
             logging.debug(f"Repositories not ready: {pending_repositories}")
             time.sleep(25)
         else:
+            logging.info(f"Data collection finished for {len(processed)}/{len(repositories)} repositories")
             break
 
     for repository in pending_repositories:
@@ -382,7 +383,6 @@ def repository_ready(grimoirelab_client: GrimoireLabClient, repository: str, aft
         return False
 
     repo_data = r.json()
-    print(repo_data)
 
     if not repo_data.get("results"):
         logging.warning(f"Repository '{repository}' not found in project")
@@ -394,7 +394,7 @@ def repository_ready(grimoirelab_client: GrimoireLabClient, repository: str, aft
     
     task = categories[0].get("task")
     if task["status"] == "failed":
-        logging.warning(f"Metrics for '{repository}' might be incomplete")
+        logging.warning(f"Data for '{repository}' might be incomplete, its last execution failed")
         return True
     elif task["last_run"]:
         last_run_dt = datetime.datetime.fromisoformat(task["last_run"])
@@ -476,7 +476,7 @@ def is_added(grimoirelab_client: GrimoireLabClient, uri: str) -> bool:
     if count_value > 0:
         uri_value = data["results"][0]["uri"]
         last_run = data["results"][0]["categories"][-1]["task"]["last_run"]
-        logging.warning(f"Repository {uri_value} already added. Last run on {last_run}")
+        logging.debug(f"Repository {uri_value} already added. Last run on {last_run}")
         return True
 
     else:

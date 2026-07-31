@@ -57,8 +57,6 @@ class npmModel:
         float: Probability score between 0.0 (Healthy) and 1.0 (Unhealthy).
         """
 
-        print(metrics)
-
         z = self.z
         
         # Calculate the linear combination (log-odds)
