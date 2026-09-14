@@ -1,5 +1,9 @@
 FROM python:3.13-slim
 
+LABEL org.opencontainers.image.source="https://github.com/aboutcode-org/healthycode"
+LABEL org.opencontainers.image.description="healthycode"
+LABEL org.opencontainers.image.licenses="GPL-3.0-or-later"
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git build-essential \
     && rm -rf /var/lib/apt/lists/*
