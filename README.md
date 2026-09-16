@@ -65,6 +65,8 @@ grimoirelab-metrics spdx.xml \
   --pony-threshold 0.5 \
   --elephant-threshold 0.5 \
   --dev-categories-thresholds 0.8 0.95 \
+  --grimoirelab-ecosystem "npm-training-set"  \
+  --grimoirelab-project "npm-popular-components" \
   --output metrics.json
 ```
 
@@ -107,6 +109,39 @@ This is an example of a valid SPDX file:
         <sourceInfo>git</sourceInfo>
     </packages>
 </Document>
+```
+
+### Running with Docker
+The tool can also be run using the published Docker image. This is useful when you
+do not want to install Poetry and the tool's dependencies locally.
+
+Build the Docker image from the repository:
+```bash
+docker build -t healthycode .
+```
+
+Then run the tool with a Git repository as the input:
+
+```bash
+docker run --rm \
+  healthycode \
+   /opt/healthycode/.venv/bin/grimoirelab-metrics https://github.com/aboutcode/example.git \
+  --grimoirelab-url http://localhost:8000 \
+  --grimoirelab-user user --grimoirelab-password password \
+  --opensearch-url https://127.0.0.1:9200 \
+  --opensearch-index events \
+  --opensearch-user 'admin' --opensearch-password 'admin' \
+  --verify-certs --opensearch-ca-certs /path/to/ca.pem \
+  --from-date 2024-01-01 --to-date 2025-01-01 \
+  --repository-timeout 3600 \
+  --code-file-pattern "\.py$|\.js$" \
+  --binary-file-pattern "\.exe$|\.tar$" \
+  --pony-threshold 0.5 \
+  --elephant-threshold 0.5 \
+  --dev-categories-thresholds 0.8 0.95 \
+  --grimoirelab-ecosystem "npm-training-set"  \
+  --grimoirelab-project "npm-popular-components" \
+  --output metrics.json
 ```
 
 ## Project Health Metrics
