@@ -42,6 +42,17 @@ jobs:
         uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051  # v5.10.0
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,event=workflow_dispatch,enable=${{ !startsWith(github.ref, 'refs/tags/') }}
+            type=semver,pattern={{version}}
+          labels: |
+            org.opencontainers.image.title=HealthyCode
+            org.opencontainers.image.description=Client to generate GrimoireLab metrics for Project Health using the software analytics platform GrimoireLab
+            org.opencontainers.image.licenses=GPL-3.0-or-later
+          annotations: |
+            org.opencontainers.image.title=HealthyCode
+            org.opencontainers.image.description=Client to generate GrimoireLab metrics for Project Health using the software analytics platform GrimoireLab
+            org.opencontainers.image.licenses=GPL-3.0-or-later
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5  # v4.1.0
@@ -54,7 +65,6 @@ jobs:
           push: true
           tags: |
             ${{ steps.meta.outputs.tags }}
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           labels: ${{ steps.meta.outputs.labels }}
           annotations: ${{ steps.meta.outputs.annotations }}
 
