@@ -210,7 +210,7 @@ def grimoirelab_metrics(
                 package_metrics["packages"][package] = {"metrics": None}
 
         package_metrics["metadata"] = {
-            "version": version("grimoirelab-metrics"),
+            "version": version("healthycode"),
             "started_at": start_date.isoformat(),
             "finished_at": datetime.datetime.now(datetime.UTC).isoformat(),
         }
