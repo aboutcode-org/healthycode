@@ -49,26 +49,6 @@ jobs:
           path: dist/*
 
 
-  create-gh-release:
-    name: Create GH release
-    needs:
-      - build-pypi-distribs
-    runs-on: ubuntu-24.04
-
-    steps:
-      - name: Download built archives
-        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131
-        with:
-          name: pypi_archives
-          path: dist
-
-      - name: Create GH release
-        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda
-        with:
-          draft: true
-          files: dist/*
-
-
   create-pypi-release:
     name: Create PyPI release
     needs:
@@ -88,3 +68,25 @@ jobs:
       - name: Publish to PyPI
         if: startsWith(github.ref, 'refs/tags')
         uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b
+
+
+  create-gh-release:
+    name: Create GH release
+    needs:
+      - build-pypi-distribs
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download built archives
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131
+        with:
+          name: pypi_archives
+          path: dist
+
+      - name: Create GH release
+        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda
+        with:
+          draft: true
+          files: dist/*
