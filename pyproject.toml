@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "grimoirelab-metrics"
+name = "healthycode"
 version = "0.1.0"
-description = ""
+description = "Client to generate GrimoireLab metrics for Project Health using the software analytics platform GrimoireLab"
 authors = [
     "Bitergia Developers",
     "AboutCode"
