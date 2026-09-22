@@ -30,23 +30,25 @@ class npmModel:
     # Model Name
     MODEL_NAME = "health"
     # Model Version
-    MODEL_VERSION = "0.1"
+    MODEL_VERSION = "0.2"
 
     # We have dropped the low-impact metrics, those with a coefficient close to 0
     COEFFICIENTS = {
-        'elephant_factor': -1.635941,
-        'coefficient_of_variation': -1.404157,
-        'total_contributors': -0.991894,
-        'days_since_last_commit': 0.865738,
-        'contributor_growth_rate': 0.435875,
-        'commits_over_periods_rate': -0.410393,
-        'total_commits': -0.330035,
-        'message_size_mean': -0.320026,
-        'found_file_license': 0.266483
+        'active_branches': -0.834069,
+        'commits_over_periods_rate': -0.841944,
+        'commit_size_added_lines': -0.389225,
+        'contributor_growth_rate': 0.114363,
+        'days_since_last_commit': 1.081051,
+        'developer_categories_casual': 0.958613,
+        'developer_categories_core': -1.277484,
+        'developer_categories_regular': 0.193106,
+        'file_types_code': -0.905957,
+        'found_file_license': 0.376334,
+        'returning_contributors': -1.167053,
     }
     
     # Model Intercept
-    Z = -0.549873845969752
+    Z = -1.023426
 
     def __init__(self):
         self.coefficients = self.COEFFICIENTS.copy()
