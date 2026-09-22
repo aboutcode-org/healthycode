@@ -27,6 +27,8 @@ import typing
 
 from collections import Counter
 
+from math import sqrt
+
 from opensearchpy import OpenSearch, Search, Q
 
 from grimoirelab_toolkit.datetime import (
@@ -262,7 +264,12 @@ class GitEventsAnalyzer:
             if mean == 0: raise ZeroDivisionError
             cv = stdev / mean
         except ZeroDivisionError as e:
-            return 0.0
+            # the activity in commits is zero,
+            # so we will return the worst possible value, which is
+            # the cv for a distribution where all the commits where
+            # made in a single month
+            months = len(commits_list)
+            return sqrt(months - 1)
 
         return cv
 
@@ -362,12 +369,16 @@ class GitEventsAnalyzer:
         return metadata
 
     def get_days_since_last_commit(self):
-        """Return the number of days since the last commit."""
+        """
+        Return the number of days since the last commit, if no commits
+        are found it returns the number of days of the monitored timeframe."""
 
-        if not self.last_commit_date:
-            return 99999
-
-        days_since_last_commit = (self.to_date - self.last_commit_date).days
+        if self.last_commit_date:
+            days_since_last_commit = (self.to_date - self.last_commit_date).days
+        elif not self.last_commit_date:
+            # when the repository was not active during the monitored timeframe
+            # we set the worst possible value within the timeframe
+            days_since_last_commit = (self.to_date - self.from_date).days
 
         return days_since_last_commit
 
