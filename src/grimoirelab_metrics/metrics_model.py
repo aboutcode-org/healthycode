@@ -82,9 +82,7 @@ class npmModel:
             
         return {
             "value": probability,
-            "metadata": {
-                "ecosystem": self.ECOSYSTEM_NAME,
-                "model": self.MODEL_NAME,
-                "version": self.MODEL_VERSION
-            }
+            "scoring_model": self.ECOSYSTEM_NAME + "-" + self.MODEL_NAME + "-" \
+                + self.MODEL_VERSION
         }
+
