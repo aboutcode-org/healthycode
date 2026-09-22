@@ -704,6 +704,7 @@ def get_repository_metrics(
             metrics["metrics"][prefix + "_" + name] = value
 
     metrics["metadata"] = analyzer.get_analysis_metadata()
+    metrics["metrics"] = dict(sorted(metrics["metrics"].items()))
 
     return metrics
 
