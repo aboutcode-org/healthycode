@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v0.2.0
+------
+
+- Order metrics dictionary before returning the result https://github.com/aboutcode-org/healthycode/pull/15
+- npm model version 0.2 https://github.com/aboutcode-org/healthycode/pull/16
 
 v0.1.2
 ------
