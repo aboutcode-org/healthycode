@@ -1,0 +1,23 @@
+upstream grimoirelab_core {
+  server grimoirelab_core:9314;
+}
+server {
+  include    mime.types;
+  sendfile on;
+  listen 8000;
+
+  server_name localhost nginx;
+
+  location / {
+      include /etc/nginx/uwsgi_params;
+      uwsgi_pass grimoirelab_core;
+      uwsgi_param Host $host;
+      uwsgi_param X-Real-IP $remote_addr;
+      uwsgi_param X-Forwarded-For $proxy_add_x_forwarded_for;
+      uwsgi_param X-Forwarded-Proto $http_x_forwarded_proto;
+  }
+
+  location /static/ {
+    alias /grimoirelab_core/;
+  }
+}
