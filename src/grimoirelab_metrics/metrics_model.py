@@ -23,10 +23,11 @@ from typing import Dict
 # These coefficients were calculated with the notebooks and data available
 # at https://github.com/aboutcode-org/healthycode/blob/main/model/npm/README.md
 
+
 class npmModel:
 
     # Ecosystem Name
-    ECOSYSTEM_NAME= "npm"
+    ECOSYSTEM_NAME = "npm"
     # Model Name
     MODEL_NAME = "health"
     # Model Version
@@ -34,19 +35,18 @@ class npmModel:
 
     # We have dropped the low-impact metrics, those with a coefficient close to 0
     COEFFICIENTS = {
-        'active_branches': -0.834069,
-        'commits_over_periods_rate': -0.841944,
-        'commit_size_added_lines': -0.389225,
-        'contributor_growth_rate': 0.114363,
-        'days_since_last_commit': 1.081051,
-        'developer_categories_casual': 0.958613,
-        'developer_categories_core': -1.277484,
-        'developer_categories_regular': 0.193106,
-        'file_types_code': -0.905957,
-        'found_file_license': 0.376334,
-        'returning_contributors': -1.167053,
+        "active_branches": -0.834069,
+        "commits_over_periods_rate": -0.841944,
+        "commit_size_added_lines": -0.389225,
+        "contributor_growth_rate": 0.114363,
+        "days_since_last_commit": 1.081051,
+        "developer_categories_casual": 0.958613,
+        "developer_categories_core": -1.277484,
+        "developer_categories_regular": 0.193106,
+        "file_types_code": -0.905957,
+        "found_file_license": 0.376334,
+        "returning_contributors": -1.167053,
     }
-    
     # Model Intercept
     Z = -1.023426
 
@@ -56,24 +56,20 @@ class npmModel:
 
     def calculate_score(self, metrics: Dict[str, float]) -> float:
         """
-        Calculates the probability of a repository being 'Unhealthy' based on 
+        Calculates the probability of a repository being 'Unhealthy' based on
         the pruned logistic regression model metrics.
-        
         Parameters:
         metrics (dict): Dictionary containing the project feature names and values.
-        
         Returns:
         float: Probability score between 0.0 (Healthy) and 1.0 (Unhealthy).
         """
 
         z = self.z
-        
         # Calculate the linear combination (log-odds)
         for metric, coef in self.coefficients.items():
             # FIXME. We set by default 0 if a metric is missing. Is this safe?
             value = metrics.get(metric, 0.0)
             z += coef * value
-            
         # Apply the Sigmoid function to get the final probability
         try:
             probability = 1 / (1 + math.exp(-z))
@@ -81,12 +77,7 @@ class npmModel:
             # Safeguard against extreme values of z
             # FIXME Is this correct?
             probability = 0.0 if z < 0 else 1.0
-            
         return {
             "value": probability,
-            "metadata": {
-                "ecosystem": self.ECOSYSTEM_NAME,
-                "model": self.MODEL_NAME,
-                "version": self.MODEL_VERSION
-            }
+            "metadata": {"ecosystem": self.ECOSYSTEM_NAME, "model": self.MODEL_NAME, "version": self.MODEL_VERSION},
         }
