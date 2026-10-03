@@ -114,7 +114,7 @@ HealthyCode uses the Goal-Question-Metric (GQM) approach. You start with what yo
 
 GitHub stars are not on the list. They answer a question about popularity, and that is not what the model asks.
 
-# The model
+## The model
 The v0.2 model was trained on about 1,150 popular npm packages drawn from Census II, Census III, and deps.dev. An open source expert reviewed 200 and classified 166 as healthy or unhealthy without seeing any scores. A logistic regression then learned which metrics best separate the two groups and how much weight each one gets. The data, notebook, a workflow diagram, and the expert's classifications guidelines are in [model/npm](model/npm).
 
 This is a first version. Weights and thresholds will be tuned as more packages and ecosystems are analyzed, and new questions and metrics will be added, drawing on [CHAOSS](https://www.chaoss.community/), [OpenSSF Scorecard](https://github.com/ossf/scorecard), and foundation maturity models.
