@@ -59,8 +59,7 @@ Here is a trimmed result for the `semver` package:
 - Researchers studying open source sustainability
 
 ## When not to use it
-HealthyCode measures project health. It does not scan for vulnerabilities or check license compliance. For those, see [VulnerableCode](https://github.com/aboutcode-org/vulnerablecode), [ScanCode.io](https://github.com/aboutcode-org/scancode.io), and
-[ScanCode Toolkit](https://github.com/aboutcode-org/scancode-toolkit).
+HealthyCode measures project health. It does not scan for vulnerabilities or check license compliance. For those, see [VulnerableCode](https://github.com/aboutcode-org/vulnerablecode), [ScanCode.io](https://github.com/aboutcode-org/scancode.io), and [ScanCode Toolkit](https://github.com/aboutcode-org/scancode-toolkit).
 
 ## Getting started 
 HealthyCode needs a running [GrimoireLab 2.x](https://github.com/chaoss/grimoirelab/blob/2.x/README.md)
@@ -83,7 +82,7 @@ docker run --rm ghcr.io/aboutcode-org/healthycode:0.2.0 \
 
 Replace the URLs and credentials with your own. To analyze an SPDX SBOM instead of a single repository, mount the file into the container and pass its path. The first run for a repository takes longer because GrimoireLab has to collect its full history.
 
-Installation, setup, and command-line usage guidance for GrimoireLab is in [grimoirelab-metrics.md]/(grimoirelab-metrics.md).
+Installation, setup, and command-line usage guidance for GrimoireLab is in [grimoirelab-guide.md]/(grimoirelab-guide.md).
 
 ## How it works
 <!-- TODO: add architecture diagrams -->
@@ -115,7 +114,7 @@ HealthyCode uses the Goal-Question-Metric (GQM) approach. You start with what yo
 GitHub stars are not on the list. They answer a question about popularity, and that is not what the model asks.
 
 ## The model
-The v0.2 model was trained on about 1,150 popular npm packages drawn from Census II, Census III, and deps.dev. An open source expert reviewed 200 and classified 166 as healthy or unhealthy without seeing any scores. A logistic regression then learned which metrics best separate the two groups and how much weight each one gets. The data, notebook, a workflow diagram, and the expert's classifications guidelines are in [model/npm](model/npm).
+The model was trained on about 1,150 popular npm packages drawn from Census II, Census III, and deps.dev. An open source expert reviewed 200 and classified 166 as healthy or unhealthy without seeing any scores. A logistic regression then learned which metrics best separate the two groups and how much weight each one gets. The data, notebook, a workflow diagram, and the expert's classifications guidelines are in [model/npm](model/npm).
 
 This is a first version. Weights and thresholds will be tuned as more packages and ecosystems are analyzed, and new questions and metrics will be added, drawing on [CHAOSS](https://www.chaoss.community/), [OpenSSF Scorecard](https://github.com/ossf/scorecard), and foundation maturity models.
 
@@ -135,7 +134,7 @@ HealthyCode also fits into the AboutCode stack. You can run it as a ScanCode.io 
 The full state-of-the-art review is available here: <!-- TODO: link state-of-the-art document -->
 
 ## Project status
-HealthyCode is at version 0.2.0 and under active development. npm is the first ecosystem, and the metrics and model will change as more packages are analyzed. If a result looks wrong to you, please open an issue with the package name and what you expected. That feedback goes straight into improving the model.
+HealthyCode is under active development. npm is the first ecosystem, and the metrics and model will change as more packages are analyzed. If a result looks wrong to you, please open an issue with the package name and what you expected. That feedback goes straight into improving the model.
 
 ## Part of AboutCode
 HealthyCode is part of [AboutCode](https://aboutcode.org), a family of open source tools, open data, and open standards for healthy and secure software supply chains, alongside ScanCode, VulnerableCode, PurlDB, and Package-URL. It is developed by AboutCode and community contributors like you!
