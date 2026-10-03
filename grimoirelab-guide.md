@@ -1,6 +1,6 @@
-# grimoirelab-metrics
+# GrimoireLab Guide for HealthyCode
 
-Client to generate GrimoireLab metrics for Project Health using the
+Client to generate GrimoireLab metrics for project health using the
 software analytics platform [GrimoireLab](https://github.com/chaoss/grimoirelab).
 
 ![grimoirelab_metrics_schema.jpg](docs/images/grimoirelab_metrics_schema.jpg)
