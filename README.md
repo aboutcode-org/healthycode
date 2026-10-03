@@ -111,8 +111,6 @@ HealthyCode uses the Goal-Question-Metric (GQM) approach. You start with what yo
 | --- | --- | --- |
 | The project stays maintained | Would it survive losing its top contributor? | Bus factor (CHAOSS Contributor Absence Factor)<br>Top author's share of commits over the last 12 months<br>Time since a second publisher shipped a release |
 
-GitHub stars are not on the list. They answer a question about popularity, and that is not what the model asks.
-
 ## The model
 The model was trained on about 1,150 popular npm packages drawn from Census II, Census III, and deps.dev. An open source expert reviewed 200 and classified 166 as healthy or unhealthy without seeing any scores. A logistic regression then learned which metrics best separate the two groups and how much weight each one gets. The data, notebook, a workflow diagram, and the expert's classifications guidelines are in [model/npm](model/npm).
 
@@ -125,22 +123,24 @@ People have been working on open source health from three directions:
 3. Community projects that work across ecosystems. CHAOSS defines open health metrics and models, and OpenSSF Scorecard scores security practices.
 
 Several commercial companies also sell package health scores. In most cases, you get the score but not the underlying data or the exact weights, which makes a result hard to check or reproduce.
-
-## HealthyCode is open code, open data, , every result can be audited
+  
+The full state-of-the-art review is available here: <!-- TODO: link state-of-the-art document -->
+  
+## With HealthyCode, every result can be audited
 The code, the collected data, and the model weights are public. Each score comes with the metrics behind it and the settings used to produce it, and each metric comes from public commit history you can check yourself. You can also rerun the analysis on your own infrastructure to verify a result. Metrics follow CHAOSS definitions where they exist, and data collection is done by GrimoireLab, a CHAOSS project.
   
-HealthyCode also fits into the AboutCode stack. You can run it as a ScanCode.io pipeline and look up results in PurlDB by PURL, the standard package identifier used in SBOMs and vulnerability databases and across software supply chains. That puts a package's health data next to its license and origin data from ScanCode for more comprehensive visibility into the packages you use.
-
-The full state-of-the-art review is available here: <!-- TODO: link state-of-the-art document -->
-
 ## Project status
-HealthyCode is under active development. npm is the first ecosystem, and the metrics and model will change as more packages are analyzed. If a result looks wrong to you, please open an issue with the package name and what you expected. That feedback goes straight into improving the model.
+HealthyCode is under active development. npm is the first supported ecosystem, and the metrics and model will change as more packages are analyzed. If a result looks wrong to you, please open an issue with the package name and what you expected. That feedback goes straight into improving the model.
 
 ## Part of AboutCode
-HealthyCode is part of [AboutCode](https://aboutcode.org), a family of open source tools, open data, and open standards for healthy and secure software supply chains, alongside ScanCode, VulnerableCode, PurlDB, and Package-URL. It is developed by AboutCode and community contributors like you!
+HealthyCode is part of [AboutCode](https://aboutcode.org), a family of open source tools, open data, and open standards for healthy and secure software supply chains, alongside ScanCode, VulnerableCode, PurlDB, and Package-URL.
+  
+You can run HealthyCode as a ScanCode.io pipeline and look up results in PurlDB by PURL, the standard package identifier used in SBOMs and vulnerability databases and across software supply chains. That puts a package's health data next to its license and origin data from ScanCode for more comprehensive visibility into the packages you use.
+  
+HealthyCode is developed by AboutCode and community contributors like you!
 
 ## Contributing
-Issues and pull requests are welcome. Please follow the [code of conduct](CODE_OF_CONDUCT.rst).
+Issues and pull requests are welcome. Please follow the [Code of Conduct](CODE_OF_CONDUCT.rst).
  
 ## License
 The code is licensed under GPL-3.0-or-later. See [LICENSE](LICENSE).  
