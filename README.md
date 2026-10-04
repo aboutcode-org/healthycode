@@ -62,9 +62,20 @@ Here is a trimmed result for the `semver` package:
 HealthyCode measures project health. It does not scan for vulnerabilities or check license compliance. For those, see [VulnerableCode](https://github.com/aboutcode-org/vulnerablecode), [ScanCode.io](https://github.com/aboutcode-org/scancode.io), and [ScanCode Toolkit](https://github.com/aboutcode-org/scancode-toolkit).
 
 ## Getting started 
-HealthyCode needs a running [GrimoireLab 2.x](https://github.com/chaoss/grimoirelab/blob/2.x/README.md)
-instance with OpenSearch. GrimoireLab collects the data, and HealthyCode
-turns it into metrics and a score.
+Access health data by Package-URL (PURL). Health data is added to [PurlDB](https://github.com/aboutcode-org/purldb), accessible via API: https://health.purldb.io/api/  
+  
+You ask for a package's health by its PURL (for example, `pkg:npm/semver`) and get the same JSON back. If the package has already been analyzed, the answer comes back right away. If not, the request starts a ScanCode.io pipeline to analyze it. Results will refresh when new versions are released.
+
+## Access health data through ScanCode.io pipelines
+>This is planned future work.
+Run HealthyCode from ScanCode.io, next to your other scans: https://github.com/aboutcode-org/scancode.io/blob/main/scanpipe/pipelines/scan_repo_health.py  
+    
+The `scan_repo_health` pipeline takes a Git repository URL, collects the data with GrimoireLab, and saves the metrics and score with the project results. Your ScanCode.io instance needs access to a GrimoireLab instance to run it.
+
+## Run HealthCode locally
+>This is planned future work. 
+  
+HealthyCode needs a running [GrimoireLab 2.x](https://github.com/chaoss/grimoirelab/blob/2.x/README.md) instance with OpenSearch. GrimoireLab collects the data, and HealthyCode turns it into metrics and a score. Installation, setup, and command-line usage guidance for GrimoireLab is in [grimoirelab-guide.md]/(grimoirelab-guide.md).
 
 The quickest way to run HealthyCode is with the published Docker image:
 
@@ -82,27 +93,23 @@ docker run --rm ghcr.io/aboutcode-org/healthycode:0.2.0 \
 
 Replace the URLs and credentials with your own. To analyze an SPDX SBOM instead of a single repository, mount the file into the container and pass its path. The first run for a repository takes longer because GrimoireLab has to collect its full history.
 
-Installation, setup, and command-line usage guidance for GrimoireLab is in [grimoirelab-guide.md]/(grimoirelab-guide.md).
 
 ## How it works
-<!-- TODO: add architecture diagrams -->
-1. You give HealthyCode a Git repository URL, or an SPDX SBOM that lists Git repositories.
+1. HealthyCode is given a Git repository URL, or an SPDX SBOM that lists Git repositories.
 2. HealthyCode asks GrimoireLab to collect each repository's history. Repositories GrimoireLab hasn't seen yet are added and analyzed.
 3. When the data is ready, HealthyCode computes the metrics over a time window. The default is 12 months.
 4. The npm health model turns those metrics into a score.
 5. The metrics, score, and run settings are written to a JSON file.
 
-HealthyCode runs on your own infrastructure. The only outside services it contacts are the public code hosts and registries the data comes from.
+#### High-level overview of HealthyCode components
+![High-level components of HealthyCode](https://github.com/user-attachments/assets/9fa54e45-a6f9-43b5-8c55-5d7159aa71ed)
 
-## Access health data through ScanCode.io pipelines
-You can run HealthyCode from ScanCode.io, next to your other scans: https://github.com/aboutcode-org/scancode.io/blob/main/scanpipe/pipelines/scan_repo_health.py  
-  
-The `scan_repo_health` pipeline takes a Git repository URL, collects the data with GrimoireLab, and saves the metrics and score with the project results. Your ScanCode.io instance needs access to a GrimoireLab instance to run it.
+#### PurlDB and ScanCode.io overview
+![PurlDB and ScanCode.io overview](https://github.com/user-attachments/assets/46d2c199-ddbc-43e0-8963-1a438bdcc20a)
 
-## Access health data by Package-URL (PURL)
-We are adding health data to [PurlDB](https://github.com/aboutcode-org/purldb) via API: https://health.purldb.io/api/  
-  
-You will be able to ask for a package's health by its PURL (for example, `pkg:npm/semver`) and get the same JSON back. If the package has already been analyzed, the answer comes back right away. If not, the request starts a ScanCode.io pipeline to analyze it. Results will refresh when new versions are released.
+#### ScanCode.io + GrimoireLab overview
+![ScanCode.io + GrimoireLab overview](https://github.com/user-attachments/assets/9d5d3bff-1e2d-4be3-8b86-132f02d9151e)
+
 
 ## The methodology
 HealthyCode uses the Goal-Question-Metric (GQM) approach. You start with what you care about (the goal), then work out what you need to know (the questions), and only then choose what you can measure (the metrics). For example:
@@ -124,7 +131,7 @@ People have been working on open source health from three directions:
 
 Several commercial companies also sell package health scores. In most cases, you get the score but not the underlying data or the exact weights, which makes a result hard to check or reproduce.
   
-The full state-of-the-art review is available here: <!-- TODO: link state-of-the-art document -->
+The full state-of-the-art review is available here: https://aboutcode.org/blog/npm-health-state-of-the-art
   
 ## With HealthyCode, every result can be audited
 The code, the collected data, and the model weights are public. Each score comes with the metrics behind it and the settings used to produce it, and each metric comes from public commit history you can check yourself. You can also rerun the analysis on your own infrastructure to verify a result. Metrics follow CHAOSS definitions where they exist, and data collection is done by GrimoireLab, a CHAOSS project.
@@ -141,6 +148,8 @@ HealthyCode is developed by AboutCode and community contributors like you!
 
 ## Contributing
 Issues and pull requests are welcome. Please follow the [Code of Conduct](CODE_OF_CONDUCT.rst).
+  
+Join the [AboutCode community Slack](https://join.slack.com/t/aboutcode-org/shared_invite/zt-31uzazd7l-tBHcqKUKkX6jUEPRLswiNw) to chat with maintainers, contributors, and users.
  
 ## License
 The code is licensed under GPL-3.0-or-later. See [LICENSE](LICENSE).  
