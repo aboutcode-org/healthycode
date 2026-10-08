@@ -24,13 +24,12 @@ at flagging a package with a known vulnerability, but they say nothing about a
 package whose last maintainer has quietly moved on...
 
 > HealthyCode starts with npm. Other ecosystems will follow.
->    
+>
 
 > npm is the largest package registry in the world, and its packages depend on
 > each other heavily. A small library can sit underneath thousands of projects.
 >
-
-> With npms, this risk can spread quickly as the JavaScript developers prefer
+> With npm packages, this risk can spread quickly as the JavaScript developers prefer
 > publishing many smaller packages, and many small unmaintained library can become
 > a single point of failure for everything built on it, and are also easier to
 > take over. When a maintainer's account or email domain expires, an attacker can
@@ -141,16 +140,16 @@ configuration or security posture of a project. For those, see:
 - [OpenSSF ScoreCard](https://github.com/ossf/scorecard) for security posture and configuration
 - [VulnerableCode](https://github.com/aboutcode-org/vulnerablecode) for vulnerability lookup
 - [ScanCode.io](https://github.com/aboutcode-org/scancode.io) to orchestrate scans including health scans
-- [ScanCode Toolkit](https://github.com/aboutcode-org/scancode-toolkit) for origin, license, copyright and dependencies
-- [PurlDB](https://github.com/aboutcode-org/purldb) that also hosts the health/ API endpoint.
-- [ClearlyDefined](https://https://github.com/clearlydefined/) that pre-scans, and curates open source packages.
+- [ScanCode Toolkit](https://github.com/aboutcode-org/scancode-toolkit) for origin, license, copyright, and dependencies
+- [PurlDB](https://github.com/aboutcode-org/purldb) that also hosts the health/API endpoint.
+- [ClearlyDefined](https://https://github.com/clearlydefined/) that pre-scans and curates open source packages.
 
 
 ## Getting started 
 
-You access health data by Package-URL (PURL) using the [PurlDB](https://github.com/aboutcode-org/purldb) /health API.
+You access health data by Package-URL (PURL) using the [PurlDB](https://github.com/aboutcode-org/purldb)/health API.
 This is accessible at https://health.purldb.io/api/health for demonstration.
-For instance, check https://health.purldb.io/api/health/?purl=pkg:npm/semver or  https://health.purldb.io/api/health/?purl=pkg:npm/lodash
+For instance, check https://health.purldb.io/api/health/?purl=pkg:npm/semver or  https://health.purldb.io/api/health/?purl=pkg:npm/lodash .
   
 You call the health API for a package using its PURL (for example,
 `pkg:npm/semver`) and get JSON back. If the package has already been analyzed,
@@ -182,7 +181,7 @@ The installation, setup, and command-line usage guidance for GrimoireLab is in
 [grimoirelab-guide.md]/(grimoirelab-guide.md).
 
 
-## How Healthy works
+## How HealthyCode works
 1. HealthyCode is given a Git repository URL, or an SPDX SBOM that lists Git repositories.
 2. HealthyCode asks GrimoireLab to collect each repository's history. Repositories GrimoireLab hasn't seen yet are added and analyzed.
 3. When the data is ready, HealthyCode computes the metrics over a time window. The default is 12 months.
