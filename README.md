@@ -40,9 +40,8 @@ you keep watching the ones you already use as dependencies.
 
 ## What's provided
 
-For this first iteration, HealthyCode focus is on npm packages. We will extend
-support to other ecosystems, and we designed the scording model to be specific
-to one open source packaging ecosystem.
+For this first iteration, we designed HealthyCode's scoring model to be specific
+to one open source packaging ecosystem, npm. We will extend future support to other ecosystems.
 
 Given a PURL (Package-URL) for a package, HealthyCode's API returns:
 
@@ -141,13 +140,13 @@ configuration or security posture of a project. For those, see:
 - [VulnerableCode](https://github.com/aboutcode-org/vulnerablecode) for vulnerability lookup
 - [ScanCode.io](https://github.com/aboutcode-org/scancode.io) to orchestrate scans including health scans
 - [ScanCode Toolkit](https://github.com/aboutcode-org/scancode-toolkit) for origin, license, copyright, and dependencies
-- [PurlDB](https://github.com/aboutcode-org/purldb) that also hosts the health/API endpoint.
+- [PurlDB](https://github.com/aboutcode-org/purldb) also hosts the health/API endpoint.
 - [ClearlyDefined](https://https://github.com/clearlydefined/) that pre-scans and curates open source packages.
 
 
 ## Getting started 
 
-You access health data by Package-URL (PURL) using the [PurlDB](https://github.com/aboutcode-org/purldb)/health API.
+You access health data by Package-URL (PURL) using the PurlDB/health API.
 This is accessible at https://health.purldb.io/api/health for demonstration.
 For instance, check https://health.purldb.io/api/health/?purl=pkg:npm/semver or  https://health.purldb.io/api/health/?purl=pkg:npm/lodash .
   
@@ -214,7 +213,7 @@ For example:
 - Metrics: Pony factor (CHAOSS Contributor Absence Factor aka. "Bus Factor" ),
 e.g., top author's share of commits over the last 12 months.
 
-## (npm-health) scoring model
+## Scoring model for health
 
 The model was trained on about 1,150 popular npm packages drawn from Census II,
 Census III, and deps.dev. As open source experts, we reviewed about 200 of these
@@ -295,8 +294,7 @@ chains. Exposing the /health endpoint in PurlDB also puts a package's health
 data next to its license and origin data collected in PurlDB from ScanCode,
 eventually delivering better visibility into the packages from multiple angles.
   
-HealthyCode is developed by the AboutCode and GrimoireLab community and
-community contributors like you!
+HealthyCode is developed by the AboutCode and GrimoireLab community and contributors like you!
 
 ## Contributing
 
