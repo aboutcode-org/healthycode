@@ -22,7 +22,6 @@ from __future__ import annotations
 import datetime
 import json
 import logging
-import os
 import re
 import sys
 import time
@@ -63,8 +62,7 @@ DEFAULT_ELEPHANT_THRESHOLD = 0.5
 @click.option("--grimoirelab-password", help="GrimoireLab API password")
 @click.option("--grimoirelab-ecosystem", help="GrimoireLab will classify the data under this ecosystem name")
 @click.option(
-    "--grimoirelab-project", 
-    help="GrimoireLab will classify the data under this project name. Projects are grouped by ecosystem"
+    "--grimoirelab-project", help="GrimoireLab will classify the data under this project name. Projects are grouped by ecosystem"
 )
 @click.option(
     "--opensearch-url",
@@ -138,7 +136,7 @@ def grimoirelab_metrics(
     """Calculate metrics and the npm health score using GrimoireLab.
 
     This tools generates a sets of project health metrics and a score using a
-    npm health model. As input it either receives a remote Git repository or a 
+    npm health model. As input it either receives a remote Git repository or a
     local SPDX SBOM file with git repositories. The data collection is scheduled
     by GrimoireLab and the health score is calculated on the fly.
 
@@ -160,7 +158,7 @@ def grimoirelab_metrics(
             git_urls = list(set(repo for repo in packages.values() if is_valid(repo)))
         elif is_git_repository(source):
             logging.debug(f"Source is a Git repository: {source}")
-            packages =  {"package0": source}
+            packages = {"package0": source}
             git_urls = [source]
         else:
             logging.debug(f"Source is a not either a filepath or Git repository: {source}. Exiting ...")
@@ -224,7 +222,7 @@ def grimoirelab_metrics(
             "dev_categories_thresholds": dev_categories_thresholds,
         }
         output.write(json.dumps(package_metrics, indent=4))
-        logging.info(f"Metrics and scores are calculated and written to file \"{output.name}\"")
+        logging.info(f'Metrics and scores are calculated and written to file "{output.name}"')
     except SPDXParsingError as e:
         logging.error(e.messages[0])
         sys.exit(1)
@@ -232,13 +230,16 @@ def grimoirelab_metrics(
         logging.error(e)
         sys.exit(1)
 
+
 def is_git_repository(value: str) -> bool:
     """Return True if value looks like a Git repository URL."""
     return re.match(GIT_REPO_REGEX, value) is not None
 
+
 def is_sbom_file(value: str) -> bool:
     """Return True if value is an existing file."""
     return Path(value).is_file()
+
 
 def get_repository(download_location: str) -> str | None:
     if is_valid(download_location):
@@ -272,11 +273,8 @@ def get_sbom_packages(file: str) -> dict[str, str]:
 
 
 def schedule_repositories(
-    repositories: list[str],
-    grimoirelab_client: GrimoireLabClient,
-    grimoirelab_ecosystem: str,
-    grimoirelab_project: str
-    ) -> None:
+    repositories: list[str], grimoirelab_client: GrimoireLabClient, grimoirelab_ecosystem: str, grimoirelab_project: str
+) -> None:
     """Schedule tasks to collect data from a list of repositories.
 
     :param repositories: List of git repositories.
@@ -389,8 +387,8 @@ def repository_ready(
     grimoirelab_ecosystem: str,
     grimoirelab_project: str,
     repository: str,
-    after_date: datetime.datetime
-    ) -> bool:
+    after_date: datetime.datetime,
+) -> bool:
     """
     Check if the task related to the repository has finished.
 
@@ -416,7 +414,6 @@ def repository_ready(
     categories = repo_data["results"][0].get("categories", [])
     if not categories:
         return False
-    
     task = categories[0].get("task")
     if task["status"] == "failed":
         logging.warning(f"Data for '{repository}' might be incomplete, its last execution failed")
@@ -440,8 +437,8 @@ def schedule_repository(
     grimoirelab_project: str,
     uri: str,
     datasource: str,
-    category: str
-    ) -> Any:
+    category: str,
+) -> Any:
     """Schedule a task to fetch a Git repository.
 
     :param grimoirelab_client: GrimoireLab API client.
@@ -458,14 +455,11 @@ def schedule_repository(
         "uri": uri,
         "datasource_type": datasource,
         "category": category,
-        "scheduler": {
-            "job_interval": 86400,
-            "job_max_retries": 3,
-            "force_run": False
-        }
+        "scheduler": {"job_interval": 86400, "job_max_retries": 3, "force_run": False},
     }
 
-    if is_added(grimoirelab_client, grimoirelab_ecosystem, grimoirelab_project, uri): return True
+    if is_added(grimoirelab_client, grimoirelab_ecosystem, grimoirelab_project, uri):
+        return True
 
     endpoint = f"api/v1/ecosystems/{grimoirelab_ecosystem}/projects/{grimoirelab_project}/repos/"
     try:
@@ -480,6 +474,7 @@ def schedule_repository(
         else:
             # If it's a different HTTP error (500, 404, 403), re-raise it
             raise e
+
 
 def is_added(grimoirelab_client: GrimoireLabClient, grimoirelab_ecosystem: str, grimoirelab_project: str, uri: str) -> bool:
     """Check if the repository is already scheduled
@@ -512,6 +507,7 @@ def is_added(grimoirelab_client: GrimoireLabClient, grimoirelab_ecosystem: str, 
 
     else:
         return False
+
 
 if __name__ == "__main__":
     grimoirelab_metrics()

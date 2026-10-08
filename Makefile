@@ -24,7 +24,7 @@ dev:
 
 doc8:
 	@echo "-> Run doc8 validation"
-	@${ACTIVATE} doc8 --quiet docs/ *.rst
+	@${ACTIVATE} doc8 --max-line-length 100 --ignore-path docs/_build/ --quiet docs/
 
 valid:
 	@echo "-> Run Ruff format"
@@ -51,7 +51,7 @@ test:
 
 docs:
 	rm -rf docs/_build/
-	@${ACTIVATE} sphinx-build docs/source docs/_build/
+	@${ACTIVATE} sphinx-build docs/source docs/_build/ 
 
 docs-check:
 	@${ACTIVATE} sphinx-build -E -W -b html docs/source docs/_build/
