@@ -1,3 +1,5 @@
+name: compose
+
 services:
     mariadb:
       image: mariadb:11.4
@@ -36,6 +38,7 @@ services:
         GRIMOIRELAB_REDIS_PASSWORD: ""
         GRIMOIRELAB_SUPERUSER_USERNAME: admin
         GRIMOIRELAB_SUPERUSER_PASSWORD: admin
+        GRIMOIRELAB_ALLOWED_HOST: "grimoirelab-nginx"
       expose:
         - "9314"
       volumes:
