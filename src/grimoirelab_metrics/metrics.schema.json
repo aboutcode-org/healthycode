@@ -1,0 +1,327 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/aboutcode-org/healthycode/blob/main/src/grimoirelab_metrics/metrics.schema.json",
+  "title": "healthycode metrics output",
+  "description": "Output of the healthycode CLI: commit-activity metrics and an unhealthy-probability score for each analyzed package. Metric descriptions and CHAOSS references when available are provided.",
+  "type": "object",
+  "required": ["packages", "metadata"],
+  "additionalProperties": false,
+  "properties": {
+    "packages": {
+      "type": "object",
+      "description": "Metrics and score for each analyzed package.",
+      "additionalProperties": { "$ref": "#/$defs/packageEntry" }
+    },
+    "metadata": { "$ref": "#/$defs/runMetadata" }
+  },
+  "$defs": {
+    "packageEntry": {
+      "description": "Either a full metrics/score record, or {\"metrics\": null} when the package's repository could not be matched to any GrimoireLab result.",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["metrics"],
+          "additionalProperties": false,
+          "properties": {
+            "metrics": { "const": null }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["metrics", "metadata", "repository", "score"],
+          "additionalProperties": false,
+          "properties": {
+            "metrics": { "$ref": "#/$defs/metrics" },
+            "metadata": { "$ref": "#/$defs/commitMetadata" },
+            "repository": {
+              "type": "string",
+              "format": "uri",
+              "description": "Git repository URL the package was resolved to."
+            },
+            "score": { "$ref": "#/$defs/score" }
+          }
+        }
+      ]
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "total_commits",
+        "total_contributors",
+        "total_organizations",
+        "pony_factor",
+        "elephant_factor",
+        "recent_organizations",
+        "recent_contributors",
+        "recent_commits",
+        "contributor_growth",
+        "contributor_growth_rate",
+        "active_branches",
+        "days_since_last_commit",
+        "casual_regular_contributors_rate",
+        "returning_contributors",
+        "commits_over_periods_rate",
+        "coefficient_of_variation",
+        "file_types_code",
+        "file_types_binary",
+        "file_types_other",
+        "commit_size_added_lines",
+        "commit_size_removed_lines",
+        "message_size_total",
+        "message_size_mean",
+        "message_size_median",
+        "developer_categories_core",
+        "developer_categories_regular",
+        "developer_categories_casual",
+        "commits_per_week",
+        "commits_per_month",
+        "commits_per_year",
+        "found_file_license",
+        "found_file_adopters"
+      ],
+      "properties": {
+        "total_commits": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of commits per repository: activity for the Git repository analyzed, within the analyzed period.",
+          "chaoss_reference": "https://www.chaoss.community/kb/metric-code-changes-commits/"
+        },
+        "total_contributors": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of developers per repository: unique participants producing commits in the repository.",
+          "chaoss_reference": "https://www.chaoss.community/kb/metric-contributors/"
+        },
+        "total_organizations": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of contributing organizations: total number of distinct organizations whose members have made contributions to the project over the analyzed period. The organization is determined by the email address of the commit author.",
+          "chaoss_reference": "https://www.chaoss.community/kb/metric-organizational-diversity/"
+        },
+        "pony_factor": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Pony factor: number of individuals who produce up to the first pony_threshold share (default 50%) of the total number of code contributions (in descending order) within the analyzed period. A low value implies a high dependency on these individuals, making the project vulnerable if they were to leave. Also known as Lottery Factor, Bus Factor, or Contributor Absence Factor.",
+          "chaoss_reference": "https://www.chaoss.community/kb/metric-contributor-absence-factor/"
+        },
+        "elephant_factor": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Elephant factor: number of unique organizations producing up to the first elephant_threshold share (default 50%) of the total number of code contributions (in descending order) within the analyzed period. Applies the Pony Factor concept to contributing organizations, determined by the email address of the commit author. First defined by Bitergia.",
+          "chaoss_reference": "https://www.chaoss.community/kb/metric-elephant-factor/"
+        },
+        "recent_organizations": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of organizations contributing recently: unique organizations whose members have actively made contributions within the last 90 days, determined by the email address of the commit author.",
+          "chaoss_reference": "https://www.chaoss.community/kb/metric-organizational-diversity/"
+        },
+        "recent_contributors": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of recent contributors: total count of unique individuals who contributed within the last 90 days.",
+          "chaoss_reference": "https://www.chaoss.community/kb/metric-contributors/"
+        },
+        "recent_commits": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of recent commits: total number of commits made to the project within the last 90 days.",
+          "chaoss_reference": "https://www.chaoss.community/kb/metric-code-changes-commits/"
+        },
+        "contributor_growth": {
+          "type": "integer",
+          "description": "Contributor growth: growth of active contributors (people sending one or more commits) between two halves of the analyzed period, i.e. second-half count minus first-half count. Can be negative."
+        },
+        "contributor_growth_rate": {
+          "type": "number",
+          "description": "Contributor growth rate: growth rate of active contributors between two halves of the analyzed period, i.e. (second-half count minus first-half count) divided by the first-half count. Can be negative."
+        },
+        "active_branches": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of active branches: count of branches in the Git repository that have seen recent development activity, usually indicated by new commits.",
+          "chaoss_reference": "https://www.chaoss.community/kb/metric-branch-lifecycle/"
+        },
+        "days_since_last_commit": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Days since last commit was submitted to the repository or the project. 99999 is used as a sentinel when there is no last-commit date.",
+          "chaoss_reference": "https://www.chaoss.community/kb/metric-code-changes-commits/"
+        },
+        "casual_regular_contributors_rate": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Rate of contributors contributing infrequently vs. regularly: ratio of casual contributors to core-plus-regular contributors, categorizing contributors by the frequency, consistency and intensity of their contributions. The CHAOSS community defines \"Occasional Contributors\" as people who make contributions to a project on an irregular basis.",
+          "chaoss_reference": "https://www.chaoss.community/kb/metric-occasional-contributors/"
+        },
+        "returning_contributors": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of contributors who have contributed in previous periods (\"returning contributors\"/contributor retention): unique individuals active in the last 90 days who had also made contributions in one or more defined previous periods."
+        },
+        "commits_over_periods_rate": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Rate of commits over specified periods: rate of commits between the last 90 days and the last year, giving an estimation of how distributed contributions are and the project's momentum."
+        },
+        "coefficient_of_variation": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Coefficient of variation of the number of commits per month (standard deviation divided by the mean), used as a measure of how consistent commit activity is period over period."
+        },
+        "file_types_code": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "File type metrics: number of touched files classified as code (matching code_file_pattern), part of the split of developer activity into code, binary, and other files."
+        },
+        "file_types_binary": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "File type metrics: number of touched files classified as binary (matching binary_file_pattern), part of the split of developer activity into code, binary, and other files."
+        },
+        "file_types_other": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "File type metrics: number of touched files that are neither code nor binary (e.g. documentation, config), part of the split of developer activity into code, binary, and other files."
+        },
+        "commit_size_added_lines": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Commit size metrics: total number of lines added across analyzed commits, giving an overview of the usual size of code review submissions.",
+          "chaoss_reference": "https://www.chaoss.community/kb/metric-change-request-commits/"
+        },
+        "commit_size_removed_lines": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Commit size metrics: total number of lines removed across analyzed commits, giving an overview of the usual size of code review submissions.",
+          "chaoss_reference": "https://www.chaoss.community/kb/metric-change-request-commits/"
+        },
+        "message_size_total": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Message size metrics: sum of the character length of all analyzed commit messages, indicating how extensively developers document their changes."
+        },
+        "message_size_mean": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Message size metrics: mean character length of analyzed commit messages, indicating how extensively developers document their changes."
+        },
+        "message_size_median": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Message size metrics: median character length of analyzed commit messages, indicating how extensively developers document their changes."
+        },
+        "developer_categories_core": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Developer categories: number of core contributors, i.e. those producing the most consistent/substantial share of contributions, classified using dev_categories_thresholds."
+        },
+        "developer_categories_regular": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Developer categories: number of regular contributors, classified using dev_categories_thresholds."
+        },
+        "developer_categories_casual": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Developer categories: number of casual contributors, i.e. those who contribute episodically, classified using dev_categories_thresholds."
+        },
+        "commits_per_week": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "description": "Frequency metrics for commits: mean number of commits per week over the analyzed period, used to understand the consistency of developer activity. null when the analyzed period is shorter than 7 days."
+        },
+        "commits_per_month": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "description": "Frequency metrics for commits: mean number of commits per month over the analyzed period, used to understand the consistency of developer activity. null when the analyzed period is shorter than 30 days."
+        },
+        "commits_per_year": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "description": "Frequency metrics for commits: mean number of commits per year over the analyzed period, used to understand the consistency of developer activity. null when the analyzed period is shorter than 365 days."
+        },
+        "found_file_license": {
+          "type": "integer",
+          "enum": [0, 1],
+          "description": "Presence of a license file in a standard location: 1 if a file containing the project's chosen open source license (LICENSE, LICENSE.md, LICENSE.txt, or COPYING) exists at the root of the repository, else 0.",
+          "chaoss_reference": "https://www.chaoss.community/kb/metric-licenses-declared/"
+        },
+        "found_file_adopters": {
+          "type": "integer",
+          "enum": [0, 1],
+          "description": "Presence of an adopters file in a standard location: 1 if a file containing the full text of the project's adopters (ADOPTERS, ADOPTERS.md, or ADOPTERS.txt) exists at the root of the repository, else 0."
+        }
+      }
+    },
+    "commitMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["first_commit", "last_commit", "first_commit_date", "last_commit_date"],
+      "properties": {
+        "first_commit": { "type": ["string", "null"], "description": "First commit hash within the analyzed period." },
+        "last_commit": { "type": ["string", "null"], "description": "Last commit hash within the analyzed period." },
+        "first_commit_date": { "type": ["string", "null"], "format": "date-time" },
+        "last_commit_date": { "type": ["string", "null"], "format": "date-time" }
+      }
+    },
+    "score": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "scoring_model"],
+      "properties": {
+        "value": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Probability of the repository being 'Unhealthy' (0.0 healthy .. 1.0 unhealthy), calculated from a pruned logistic regression model over the metrics above."
+        },
+        "scoring_model": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+-[a-z0-9]+-[0-9]+(\\.[0-9]+)*$",
+          "description": "Ecosystem-model-version identifier, e.g. \"npm-health-0.1\"."
+        }
+      }
+    },
+    "runMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "started_at", "finished_at", "configuration"],
+      "properties": {
+        "version": { "type": "string", "description": "healthycode package version." },
+        "started_at": { "type": "string", "format": "date-time" },
+        "finished_at": { "type": "string", "format": "date-time" },
+        "configuration": { "$ref": "#/$defs/configuration" }
+      }
+    },
+    "configuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "from_date",
+        "to_date",
+        "code_file_pattern",
+        "binary_file_pattern",
+        "pony_threshold",
+        "elephant_threshold",
+        "dev_categories_thresholds"
+      ],
+      "properties": {
+        "from_date": { "type": "string", "format": "date-time" },
+        "to_date": { "type": "string", "format": "date-time" },
+        "code_file_pattern": { "type": "string", "description": "Regex used to classify code files (feeds file_types_code)." },
+        "binary_file_pattern": { "type": "string", "description": "Regex used to classify binary files (feeds file_types_binary)." },
+        "pony_threshold": { "type": "number", "minimum": 0, "maximum": 1, "description": "Cumulative commit-share threshold used to compute pony_factor." },
+        "elephant_threshold": { "type": "number", "minimum": 0, "maximum": 1, "description": "Cumulative commit-share threshold used to compute elephant_factor." },
+        "dev_categories_thresholds": {
+          "type": "array",
+          "items": { "type": "number", "minimum": 0, "maximum": 1 },
+          "minItems": 2,
+          "maxItems": 2,
+          "description": "[core/regular cutoff, regular/casual cutoff] cumulative commit-share thresholds used for developer_categories_*."
+        }
+      }
+    }
+  }
+}
