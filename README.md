@@ -14,8 +14,14 @@ scored and how, and to set own policy thresholds.
 
 HealthyCode uses [GrimoireLab](https://github.com/chaoss/grimoirelab) to collect
 data, [ScanCode.io](https://github.com/aboutcode-org/scancode.io) to run
-pipelines, and [PurlDB](https://github.com/aboutcode-org/purldb) to store the
-data.
+pipelines, and [PurlDB](https://github.com/aboutcode-org/purldb) to store and
+access the data.
+
+The main entry point is the PurlDB `health/` API endpoint accessed with a PURL.
+
+A live demo system is available at https://health.purldb.io/api/health/
+Use https://health.purldb.io/api/health/?purl=pkg:npm/lodash as an example
+of a health metric for the lodash npm. 
 
 ## Why project health matters
 
@@ -41,7 +47,8 @@ you keep watching the ones you already use as dependencies.
 ## What's provided
 
 For this first iteration, we designed HealthyCode's scoring model to be specific
-to one open source packaging ecosystem, npm. We will extend future support to other ecosystems.
+to one open source packaging ecosystem, npm. We will extend future support to
+other ecosystems.
 
 Given a PURL (Package-URL) for a package, HealthyCode's API returns:
 
@@ -50,9 +57,9 @@ contributor activity and growth, days since last commit, pony factor (how many
 people do half the work), and the elephant factor (how many organizations do
 half the work). The full list is in [METRICS.md](METRICS.md).
 
-- A health score is calculted from the metrics, between 0 and 1 that is the
-model's estimate of how likely the project is to be healthy. 0 means unhealthy
-or risky, and 1 means healthier and less risky.
+- A health score is calculated from the metrics, with a value between 0 and 1
+that is the model's estimate of how likely the project is to be healthy.
+0 means unhealthy or risky, and 1 means healthier and less risky.
 
 - The settings used for the run: time window, thresholds, and the versions of
 HealthyCode and the scoring model.
@@ -60,65 +67,69 @@ HealthyCode and the scoring model.
 The API results are JSON, so you can pull these into a dashboard, a report, or
 in your software supply processing and management pipelines, including policies
 to allow or block or alert in your own tooling about the health of a software
-page. HealthyCode gives you the evidence, but the policy decision stays with
-you.
+page. HealthyCode returns metrics (evidence) and a score (interpretation) and
+you make decisions based you own policies.
+
 
 Here is a sample result for the `pkg:npm/semver` package:  
 ```json
 {
-    "purl": "pkg:npm/semver",
-    "source_purl": "pkg:github/npm/node-semver",
-    "vcs_url": "https://github.com/npm/node-semver.git",
-    "scoring_model": "npm-health-0.2",
-    "score": 1.0,
-    "commit_range": {
-        "last_commit": "3484e1785e18a7ae4f06365f35c7b6eaec05088a",
-        "first_commit": "a25789b09b1192fa8414c35f2cd679ae2e1d5192",
-        "last_commit_date": "2026-09-10T19:51:52+00:00",
-        "first_commit_date": "2025-10-07T10:26:26-07:00"
-    },
-    "run_start_date": "2026-10-07T21:22:06.088852Z",
-    "run_end_date": "2026-10-07T21:22:06.799342Z",
-    "metrics": {
-        "pony_factor": 2,
-        "total_commits": 45,
-        "recent_commits": 45,
-        "active_branches": 10,
-        "elephant_factor": 1,
-        "file_types_code": 37,
-        "commits_per_week": 0.8630136986301369,
-        "commits_per_year": 45.0,
-        "file_types_other": 61,
-        "commits_per_month": 3.6986301369863015,
-        "file_types_binary": 0,
-        "message_size_mean": 2538.8444444444444,
-        "contributor_growth": 5,
-        "found_file_license": 1,
-        "message_size_total": 114248,
-        "total_contributors": 16,
-        "found_file_adopters": 0,
-        "message_size_median": 593,
-        "recent_contributors": 16,
-        "total_organizations": 5,
-        "recent_organizations": 5,
-        "days_since_last_commit": 26,
-        "returning_contributors": 0,
-        "commit_size_added_lines": 930,
-        "contributor_growth_rate": 0.7142857142857143,
-        "coefficient_of_variation": 1.0786365421788087,
-        "commit_size_removed_lines": 137,
-        "commits_over_periods_rate": 1.0,
-        "developer_categories_core": 7,
-        "developer_categories_casual": 0,
-        "developer_categories_regular": 9,
-        "casual_regular_contributors_rate": 0.0
-    },
-    "date_collected": "2026-10-07T21:22:07.178202Z"
+  "purl": "pkg:npm/semver",
+  "source_purl": "pkg:github/npm/node-semver",
+  "vcs_url": "https://github.com/npm/node-semver.git",
+  "scoring_model": "npm-health-0.2",
+  "score": 1.0,
+  "commit_range": {
+    "last_commit": "c45ec23921ef57d82a420cb6f04f28cf12563ab2",
+    "first_commit": "ab9e28a582f524e8d40157f3d2b75fcc764d0765",
+    "last_commit_date": "2026-10-26T15:48:35-04:00",
+    "first_commit_date": "2025-10-30T09:00:25-07:00"
+  },
+  "run_start_date": "2026-10-27T13:52:38.948855Z",
+  "run_end_date": "2026-10-27T13:52:39.721434Z",
+  "metrics": {
+    "pony_factor": 3,
+    "total_commits": 56,
+    "recent_commits": 56,
+    "active_branches": 16,
+    "elephant_factor": 2,
+    "file_types_code": 99,
+    "commits_per_week": 1.073972602739726,
+    "commits_per_year": 56.0,
+    "file_types_other": 55,
+    "commits_per_month": 4.602739726027398,
+    "file_types_binary": 0,
+    "message_size_mean": 1803.4464285714287,
+    "contributor_growth": 6,
+    "found_file_license": 1,
+    "message_size_total": 100993,
+    "total_contributors": 17,
+    "found_file_adopters": 0,
+    "message_size_median": 471,
+    "recent_contributors": 17,
+    "total_organizations": 5,
+    "recent_organizations": 5,
+    "days_since_last_commit": 0,
+    "returning_contributors": 0,
+    "commit_size_added_lines": 10619,
+    "contributor_growth_rate": 0.8571428571428571,
+    "coefficient_of_variation": 1.145922229081032,
+    "commit_size_removed_lines": 449,
+    "commits_over_periods_rate": 1.0,
+    "developer_categories_core": 6,
+    "developer_categories_casual": 3,
+    "developer_categories_regular": 8,
+    "casual_regular_contributors_rate": 0.21428571428571427
+  },
+  "date_collected": "2026-10-27T13:52:40.041878Z"
 }
 
 ```
 
 ## Who is HealthyCode for?
+
+We designed HealthyCode to support software supply chain(s) decisions making.
+This is for:
 
 - Software and engineering teams deciding whether to adopt, upgrade, replace, or
 drop a dependency in their codebases
@@ -149,7 +160,10 @@ configuration or security posture of a project. For those, see:
 You access health data by Package-URL (PURL) using the PurlDB/health API.
 This is accessible at https://health.purldb.io/api/health for demonstration.
 For instance, check https://health.purldb.io/api/health/?purl=pkg:npm/semver or  https://health.purldb.io/api/health/?purl=pkg:npm/lodash .
-  
+
+Or https://health.purldb.io/api/health/?purl=pkg:npm/semver&format=json
+
+
 You call the health API for a package using its PURL (for example,
 `pkg:npm/semver`) and get JSON back. If the package has already been analyzed,
 the answer comes back immediately. If not, you can poll the same URL until the
@@ -172,20 +186,22 @@ access to a configured GrimoireLab instance and HealthCode models.
 
 ## Run HealthCode locally
 
-HealthyCode needs a running [GrimoireLab 2.x](https://github.com/chaoss/grimoirelab/blob/2.x/README.md) with
-OpenSearch. GrimoireLab collects the data, and HealthyCode turns the data into metrics
-(like the menagerie of ponies and elephants) and computes a score.
+See  [Installation guide]/(deploy/README.md).
 
-The installation, setup, and command-line usage guidance for GrimoireLab is in
-[grimoirelab-guide.md]/(grimoirelab-guide.md).
+## High Theory of Operations for HealthyCode
 
-
-## How HealthyCode works
-1. HealthyCode is given a Git repository URL, or an SPDX SBOM that lists Git repositories.
-2. HealthyCode asks GrimoireLab to collect each repository's history. Repositories GrimoireLab hasn't seen yet are added and analyzed.
-3. When the data is ready, HealthyCode computes the metrics over a time window. The default is 12 months.
-4. The npm health model turns those metrics into a score.
-5. The metrics, score, and run settings are written to a JSON file.
+- PurlDB health API receives a PURL. If the health score is available in the DB
+the score and metrics are return as-is.
+- Otherwise, PurlDB finds the corresponding Git repository.
+- PurlDB calls is scan worker (ScanCode.io) to run the "scan_repo_health"
+pipeline on that git repo
+- That pipeline calls the HealthyCode script
+- HealthyCode calls GrimoireLab to clone and collect the repository history
+- When the data is ready, HealthyCode computes the metrics over a time window.
+- The npm health model turns those metrics into a score.
+- The metrics, score, and run settings are written to a JSON file
+- That JSON is passed back to ScanCode.io, and then passed back PurlDB
+- PurlDB stores the metrics and score for the PURL and return the API results as JSON
 
 #### High-level overview of HealthyCode components
 
@@ -294,7 +310,8 @@ chains. Exposing the /health endpoint in PurlDB also puts a package's health
 data next to its license and origin data collected in PurlDB from ScanCode,
 eventually delivering better visibility into the packages from multiple angles.
   
-HealthyCode is developed by the AboutCode and GrimoireLab community and contributors like you!
+HealthyCode is developed by the AboutCode and GrimoireLab community and
+contributors like you!
 
 ## Contributing
 
