@@ -164,3 +164,7 @@ NGINX_PUBLISHED_HTTPS_PORT=8443
 ```
 
 ### 6. Restart ScanCode.io
+```
+# cd into scancode.io-deploy/
+make restart
+```
