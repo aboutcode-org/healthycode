@@ -179,7 +179,7 @@ make envfile
 Get or create a PurlDB API key for the scanworker:
 ```
 sudo docker compose -f /opt/purldb/docker-compose.yml exec web purldb \
-  create-scan-queue-worker-user scancode-worker <username>
+  create-scan-queue-worker-user scancode-worker --generate-api-key <username>
 ```
 
 Copy the scancode-worker API Key, and open `/opt/scancodeio/.env` in a text editor.
