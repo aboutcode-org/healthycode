@@ -269,12 +269,12 @@ Start ScanCode with HealthyCode profile
 ```
 sudo docker compose \
   -f /opt/scancodeio/docker-compose.purldb-scan-worker.yml \
-  -f /opt/healthycode/deploy/etc/scancodeio/networks.yml \
+  -f /opt/healthycode/deploy/etc/scancodeio/network.yml \
   --profile healthycode \
   up --scale worker=2 -d
 ```
 
-Note: we attach shared GrimoireLab network to ScanCode service using `networks.yml`
+Note: we attach shared GrimoireLab network to ScanCode service using `network.yml`
 
 ## Verify everything is working end to end
 
@@ -293,7 +293,7 @@ Start ScanCode.io
 ```
 sudo docker compose \
   -f /opt/scancodeio/docker-compose.purldb-scan-worker.yml \
-  -f /opt/healthycode/deploy/etc/scancodeio/networks.yml \
+  -f /opt/healthycode/deploy/etc/scancodeio/network.yml \
   --profile healthycode \
   up --scale worker=2 -d
 ```
