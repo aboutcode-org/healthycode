@@ -18,6 +18,10 @@ The machine should have at least 32GB RAM (more is better), and about 500GB
 for the base installation. For on-going production, more disk space is required
 in order to keep git clones of all the tracked open source projects.
 
+For component-level infrastructure considerations and a 10,000-package benchmark
+workload, see the [deployment sizing guidance](sizing.md). These baseline values
+are not benchmark-validated sizing recommendations.
+
 
 ## GrimoireLab installation
 
