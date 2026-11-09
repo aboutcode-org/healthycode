@@ -1,4 +1,4 @@
-FROM python:3.13-slim
+FROM python:3.14-slim
 
 LABEL org.opencontainers.image.source="https://github.com/aboutcode-org/healthycode"
 LABEL org.opencontainers.image.description="Client to generate GrimoireLab metrics for Project Health using the software analytics platform GrimoireLab"
