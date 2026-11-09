@@ -118,15 +118,22 @@ class EndToEndTestCase(TestCase):
 
         from grimoirelab.core.runner.cmd import grimoirelab
 
-        cls.runner.invoke(grimoirelab, ["admin", "setup"], input="n\n")
-        subprocess.run(
+        result = cls.runner.invoke(grimoirelab, ["admin", "setup"], input="n\n")
+        if result.exit_code != 0:
+            raise RuntimeError(f"'grimoirelab admin setup' failed: {result.output}")
+
+        create_user = subprocess.run(
             ["grimoirelab", "admin", "create-user", "--username", GRIMOIRELAB_USER, "--no-interactive"],
             capture_output=True,
         )
+        if create_user.returncode != 0:
+            raise RuntimeError(f"'grimoirelab admin create-user' failed:\n{create_user.stderr.decode()}")
 
         cls._promote_admin_superuser()
 
-        cls.grimoirelab_server = cls._start_grimoirelab_process(["grimoirelab", "run", "server", "--dev"])
+        # '--dev' was removed in grimoirelab-core 1.0.0a2; the API is
+        # Note: the worker processes require Python < 3.14, where 'fork'
+        cls.grimoirelab_server = cls._start_grimoirelab_process(["grimoirelab", "run", "server"])
         cls._wait_for_grimoirelab_server()
 
         cls.grimoirelab_eventizers = cls._start_grimoirelab_process(["grimoirelab", "run", "eventizers", "--workers", "10"])
@@ -142,7 +149,9 @@ class EndToEndTestCase(TestCase):
             "User = get_user_model(); "
             f"User.objects.filter(username='{GRIMOIRELAB_USER}').update(is_superuser=True, is_staff=True)"
         )
-        subprocess.run([sys.executable, "-c", code], capture_output=True)
+        promote = subprocess.run([sys.executable, "-c", code], capture_output=True)
+        if promote.returncode != 0:
+            raise RuntimeError(f"Failed to promote admin user to superuser:\n{promote.stderr.decode()}")
 
     @classmethod
     def _wait_for_grimoirelab_server(cls, timeout=120):
@@ -151,9 +160,12 @@ class EndToEndTestCase(TestCase):
             try:
                 urllib.request.urlopen(GRIMOIRELAB_URL, timeout=5)
                 return
+            except urllib.error.HTTPError:
+                # Any HTTP response (even 404 on '/') means the server is up.
+                return
             except Exception:
                 time.sleep(1)
-        raise RuntimeError("GrimoireLab server failed to start.")
+        raise RuntimeError(f"GrimoireLab server failed to start within {timeout}s.")
 
     @classmethod
     def _create_grimoirelab_resources(cls):
