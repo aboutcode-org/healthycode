@@ -11,7 +11,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /opt/healthycode
 
 RUN pip install --no-cache-dir poetry
-RUN poetry config virtualenvs.in-project true
+RUN poetry config virtualenvs.in-project true \
+    && poetry config virtualenvs.options.always-copy true
 
 COPY pyproject.toml poetry.lock* ./
 RUN poetry install --no-interaction --no-ansi --no-root
