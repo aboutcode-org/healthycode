@@ -152,6 +152,7 @@ make envfile
 Open `/opt/purldb/.env` in a text editor and populate with this config:
 
 ```
+PURLDB_REQUIRE_AUTHENTICATION=False
 ALLOWED_HOSTS=<your host>
 SITE_URL=https://<your host>/
 PURLDB_PUBLIC_SETUP=True
@@ -163,6 +164,14 @@ Build and run PurlDB
 sudo docker compose -f /opt/purldb/docker-compose.yml build
 sudo docker compose -f /opt/purldb/docker-compose.yml up -d
 ```
+
+> [!NOTE]
+> By default `PURLDB_REQUIRE_AUTHENTICATION` is set to `True`, an authentication token is required to access the PurlDB API.
+>
+> Once PurlDB is up and running, generate an authentication token by running:
+> ```bash
+> sudo docker compose -f /opt/purldb/docker-compose.yml exec web ./manage.py create-user --generate-api-key <username>
+> ```
 
 Once completed, make sure that PurlDB is up and running.
 
@@ -205,6 +214,8 @@ sudo vi /opt/scancodeio/.env
 
 Populate with this config:
 ```
+SCANCODEIO_REQUIRE_AUTHENTICATION=False
+
 GRIMOIRELAB_URL="http://grimoirelab-nginx:8000/"
 GRIMOIRELAB_OPENSEARCH_URL="https://grimoirelab-opensearch:9200/"
 GRIMOIRELAB_ECOSYSTEM="npmlargerecosystem"
@@ -228,6 +239,16 @@ GRIMOIRELAB_PASSWORD=""
 GRIMOIRELAB_OPENSEARCH_USERNAME=""
 GRIMOIRELAB_OPENSEARCH_PASSWORD=""
 ```
+
+
+> [!NOTE]
+> By default, `SCANCODEIO_REQUIRE_AUTHENTICATION` is set to `True`, which means a username and password are required to log in to ScanCode.io.
+>
+> Once ScanCode.io is up and running, create a user using the following command:
+> ```bash
+> docker compose -f /opt/scancodeio/docker-compose.yml exec web ./manage.py scanpipe create-user <username>
+> ```
+
 
 #### Expose ScanCode.io on port 8443
 
@@ -335,7 +356,7 @@ docker compose -f /opt/healthycode/deploy/docker-compose/docker-compose-grimoire
 
 ## Enable authentication for ScanCode.io (Optional):
 
-Add this to `/opt/scancodeio/.env`
+Add/edit this to `/opt/scancodeio/.env`
 
 ```
 SCANCODEIO_REQUIRE_AUTHENTICATION=True
@@ -348,6 +369,24 @@ docker compose -f /opt/scancodeio/docker-compose.yml exec web ./manage.py scanpi
 ```
 
 Restart ScanCode.io service.
+
+
+## Enable authentication for PurlDB (Optional):
+
+Add/edit this to `/opt/purldb/.env`
+
+```
+PURLDB_REQUIRE_AUTHENTICATION=True
+```
+
+Run this command to generate auth token required to access PurlDB API:
+
+```
+sudo docker compose -f /opt/purldb/docker-compose.yml exec web ./manage.py create-user --generate-api-key <username>
+```
+
+Restart PurlDB service.
+
 
 ## SSL/TLS Configuration
 
