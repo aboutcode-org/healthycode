@@ -30,7 +30,7 @@ httpretty = "^1.1.4"
 flake8 = "^7.1.1"
 pre-commit = "^4.1.0"
 black = "^24.10.0"
-grimoirelab-core = "^0.1"
+grimoirelab-core = "^1.0.0a2"
 testcontainers = {extras = ["opensearch", "redis", "generic", "mysql"], version = "^4.9.1"}
 
 [tool.poetry.group.docs]

@@ -1,4 +1,4 @@
-FROM python:3.13-slim
+FROM python:3.14-slim
 
 LABEL org.opencontainers.image.source="https://github.com/aboutcode-org/healthycode"
 LABEL org.opencontainers.image.description="Client to generate GrimoireLab metrics for Project Health using the software analytics platform GrimoireLab"
@@ -11,7 +11,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /opt/healthycode
 
 RUN pip install --no-cache-dir poetry
-RUN poetry config virtualenvs.in-project true
+RUN poetry config virtualenvs.in-project true \
+    && poetry config virtualenvs.options.always-copy true
 
 COPY pyproject.toml poetry.lock* ./
 RUN poetry install --no-interaction --no-ansi --no-root
