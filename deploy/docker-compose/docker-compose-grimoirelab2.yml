@@ -2,7 +2,7 @@ name: compose
 
 services:
     mariadb:
-      image: mariadb:11.4
+      image: mariadb@sha256:5e73baf8179b29f115101bb102763a47a017361f3e9792daccba6646c3ab1532 # 11.4.13
       expose:
         - "3306"
       environment:
@@ -26,7 +26,7 @@ services:
 
     grimoirelab_core:
       restart: on-failure:3
-      image: grimoirelab/grimoirelab:2.x
+      image: grimoirelab/grimoirelab@sha256:2379f183d668ee01a165bece31e829850b15ec8a20d4367dbf708b363d2619ce #2.x
       environment:
         GRIMOIRELAB_DB_HOST: mariadb
         GRIMOIRELAB_DB_PORT: 3306
@@ -38,7 +38,7 @@ services:
         GRIMOIRELAB_REDIS_PASSWORD: ""
         GRIMOIRELAB_SUPERUSER_USERNAME: admin
         GRIMOIRELAB_SUPERUSER_PASSWORD: admin
-        GRIMOIRELAB_ALLOWED_HOST: "grimoirelab-nginx"
+        GRIMOIRELAB_ALLOWED_HOST: "127.0.0.1,localhost,grimoirelab-nginx"
       expose:
         - "9314"
       volumes:
@@ -52,7 +52,7 @@ services:
 
     grimoirelab_core_eventizers:
       restart: on-failure:3
-      image: grimoirelab/grimoirelab:2.x
+      image: grimoirelab/grimoirelab@sha256:2379f183d668ee01a165bece31e829850b15ec8a20d4367dbf708b363d2619ce #2.x
       environment:
         GRIMOIRELAB_DB_HOST: mariadb
         GRIMOIRELAB_DB_PORT: 3306
@@ -71,7 +71,7 @@ services:
 
     grimoirelab_core_archivists:
       restart: on-failure:3
-      image: grimoirelab/grimoirelab:2.x
+      image: grimoirelab/grimoirelab@sha256:2379f183d668ee01a165bece31e829850b15ec8a20d4367dbf708b363d2619ce #2.x
       environment:
         GRIMOIRELAB_DB_HOST: mariadb
         GRIMOIRELAB_DB_PORT: 3306
@@ -95,7 +95,7 @@ services:
 
     grimoirelab_core_ushers:
         restart: on-failure:3
-        image: grimoirelab/grimoirelab:2.x
+        image: grimoirelab/grimoirelab@sha256:2379f183d668ee01a165bece31e829850b15ec8a20d4367dbf708b363d2619ce #2.x
         environment:
           GRIMOIRELAB_DB_HOST: mariadb
           GRIMOIRELAB_DB_PORT: 3306
@@ -113,7 +113,7 @@ services:
         command: grimoirelab run ushers
 
     sortinghat_worker:
-      image: grimoirelab/sortinghat-worker
+      image: grimoirelab/sortinghat-worker@sha256:22cd68e8059aedec83e770975e7eb31477256ffd488ab85375ee4cc2c2eb9298 # 1.21.0
       environment:
         SORTINGHAT_SECRET_KEY: secret
         SORTINGHAT_DB_HOST: mariadb
@@ -131,7 +131,7 @@ services:
           condition: service_healthy
 
     opensearch-node1:
-      image: opensearchproject/opensearch:3
+      image: opensearchproject/opensearch@sha256:fafe3fc3587088674669235575aa166228c48bdb940294a8cdbbc1da75236a40 # 3.8.0
       environment:
         cluster.name: opensearch-cluster
         node.name: opensearch-node1
@@ -159,7 +159,7 @@ services:
 
     nginx:
       restart: on-failure:3
-      image: nginx:latest
+      image: nginx:1.31.4-alpine
       volumes:
         - ./default-grimoirelab-settings/nginx.conf.template:/etc/nginx/templates/default.conf.template
         - ./default-grimoirelab-settings/uwsgi_params:/etc/nginx/uwsgi_params
