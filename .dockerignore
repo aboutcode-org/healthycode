@@ -20,11 +20,9 @@ docker-compose.yml
 
 
 # Ignore etc, docs and build dirs
-**/docs
 **/dist
 **/build
 **/etc
-.readthedocs.yaml
 CHANGELOG.rst
 README.rst
 
