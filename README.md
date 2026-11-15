@@ -1,7 +1,7 @@
 # HealthyCode
 
-Open source project health metrics and scores, built on an open model, open
-methodology, with open data.
+Open source project health metrics and scores, built on an open model and open
+methodology, with open data and open source tools.
 
 HealthyCode attempts to tell you how healthy an open source projects is, so you
 can make more informed, data-driven decisions about which packages to adopt,
@@ -19,9 +19,9 @@ access the data.
 
 The main entry point is the PurlDB `health/` API endpoint accessed with a PURL.
 
-A live demo system is available at https://health.purldb.io/api/health/
-Use https://health.purldb.io/api/health/?purl=pkg:npm/lodash as an example
-of a health metric for the lodash npm. 
+A live demo system is available at: https://health.purldb.io/api/health/
+
+Here is an example using `pkg:npm/lodash`: https://health.purldb.io/api/health/?purl=pkg:npm/lodash
 
 ## Why project health matters
 
@@ -59,7 +59,7 @@ half the work). The full list is in [METRICS.md](METRICS.md).
 
 - A health score is calculated from the metrics, with a value between 0 and 1
 that is the model's estimate of how likely the project is to be healthy.
-0 means unhealthy or risky, and 1 means healthier and less risky.
+0 means unhealthy or risky, and 1 means healthier or less risky.
 
 - The settings used for the run: time window, thresholds, and the versions of
 HealthyCode and the scoring model.
@@ -67,7 +67,7 @@ HealthyCode and the scoring model.
 The API results are JSON, so you can pull these into a dashboard, a report, or
 in your software supply processing and management pipelines, including policies
 to allow or block or alert in your own tooling about the health of a software
-page. HealthyCode returns metrics (evidence) and a score (interpretation) and
+project. HealthyCode returns metrics (evidence) and a score (interpretation) and
 you make decisions based you own policies.
 
 
@@ -144,7 +144,7 @@ the packages used in their organization apps, systems and products
 ## When not to use HealthyCode
 
 HealthyCode measures or rather approximates an open source project's health. It
-does not scan for vulnerabilities or check license compliance or check the
+does not scan for vulnerabilities or license compliance, or check the
 configuration or security posture of a project. For those, see:
 
 - [OpenSSF ScoreCard](https://github.com/ossf/scorecard) for security posture and configuration
@@ -152,17 +152,16 @@ configuration or security posture of a project. For those, see:
 - [ScanCode.io](https://github.com/aboutcode-org/scancode.io) to orchestrate scans including health scans
 - [ScanCode Toolkit](https://github.com/aboutcode-org/scancode-toolkit) for origin, license, copyright, and dependencies
 - [PurlDB](https://github.com/aboutcode-org/purldb) also hosts the health/API endpoint.
-- [ClearlyDefined](https://https://github.com/clearlydefined/) that pre-scans and curates open source packages.
+- [ClearlyDefined](https://github.com/clearlydefined/) that pre-scans and curates open source packages.
 
 
 ## Getting started 
 
-You access health data by Package-URL (PURL) using the PurlDB/health API.
-This is accessible at https://health.purldb.io/api/health for demonstration.
-For instance, check https://health.purldb.io/api/health/?purl=pkg:npm/semver or  https://health.purldb.io/api/health/?purl=pkg:npm/lodash .
+You access health data for a package using its PURL with the `PurlDB/health` API at: https://health.purldb.io/api/health
 
-Or https://health.purldb.io/api/health/?purl=pkg:npm/semver&format=json
-
+Here are two examples:
+- https://health.purldb.io/api/health/?purl=pkg:npm/semver
+- https://health.purldb.io/api/health/?purl=pkg:npm/semver&format=json
 
 You call the health API for a package using its PURL (for example,
 `pkg:npm/semver`) and get JSON back. If the package has already been analyzed,
@@ -172,8 +171,7 @@ metrics and scores are collected and computed. The request will return first a
 The results are cached for a week, and the JSON is returned last.
 
 The processing goes from PurlDB `/health` api endpoint through ScanCode.io
-`scan_repo_health` pipeline to the HealthyCode npm-health scoring model (for
-now, for npms only), that calls GrimoireLab to collect project metrics.
+`scan_repo_health` pipeline to the npm Health Model, that calls GrimoireLab to collect project metrics.
 
 ## Access health data through ScanCode.io pipelines
 
@@ -182,11 +180,11 @@ https://github.com/aboutcode-org/scancode.io/blob/main/scanpipe/pipelines/scan_r
 
 That pipeline takes a Git repository URL, collects the data with GrimoireLab,
 and saves the metrics and score with the project results. Your ScanCode.io needs
-access to a configured GrimoireLab instance and HealthCode models.
+access to a configured GrimoireLab instance and HealthyCode models.
 
-## Run HealthCode locally
+## Run HealthyCode locally
 
-See  [Installation guide]/(deploy/README.md).
+See  [Installation guide](deploy/README.md).
 
 ## High Theory of Operations for HealthyCode
 
@@ -234,8 +232,8 @@ e.g., top author's share of commits over the last 12 months.
 The model was trained on about 1,150 popular npm packages drawn from Census II,
 Census III, and deps.dev. As open source experts, we reviewed about 200 of these
 npms and classified them as "healthy" or "unhealthy" to create a training
-dataset. We computed a logistic regression to determine and learn learned which
-metrics best dsicriminate between the two groups and how much weight each metric
+dataset. We computed a logistic regression to determine and learn which
+metrics best discriminate between the two groups and how much weight each metric
 would get in the score computation.
 
 All the backing data, the Jupyter notebook, a workflow diagram, and our expert
@@ -249,14 +247,14 @@ same approch; and new questions and metrics will be added, drawing on
 [OpenSSF Scorecard](https://github.com/ossf/scorecard),
 and foundation maturity models.
 
-Eventually we plan to enrich back the [OpenSSF
+We plan to enrich back the [OpenSSF
 Scorecard](https://github.com/ossf/scorecard) with these metrics as additionals
 checks.
 
 
-## How this project compares to other approaches and alterives
+## How this project compares to other approaches and alternatives
 
-We have published a review of the state-of-the-art here:
+We published a state-of-the-art review here:
 https://aboutcode.org/blog/npm-health-state-of-the-art
 
 People have been working on open source health from these three directions:
@@ -282,7 +280,7 @@ reproduce.
 ## Most importantly, our results can be audited and traced
 
 The code, the collected data, and the model weights are open and public. Each
-score is backed and comed by its supporting metrics; metrics comes from public
+score is backed by its supporting metrics; metrics comes from public
 project data and history that can be verified.
 
 And you can also rerun the analysis on your own infrastructure to verify, and
@@ -293,8 +291,8 @@ and data collection is run by GrimoireLab, a CHAOSS project.
 
 HealthyCode is under active development with npm as the first supported
 ecosystem. The selected metrics and models will change as more packages are
-analyzed, and if a result looks wrong to you, please open an issue with the
-Package-URL and a hint of what you expected. That feedback will go directlyinto
+analyzed, and if a result looks wrong to you, please open an issue (including the
+PURL used) and what you expected. That feedback will go directly into
 improving the model with new and improved training data!
 
 ## HealthyCode in the larger AboutCode context
@@ -302,7 +300,7 @@ improving the model with new and improved training data!
 HealthyCode is an initiative that is part of [AboutCode](https://aboutcode.org),
 a family of open source tools, open data, and open standards for healthy and
 safe software supply chains, together with ScanCode, VulnerableCode, PurlDB,
-DejaCode, and Package-URL.
+DejaCode, and PURL.
   
 You can get results in the PurlDB health API by PURL, the standard package
 identifier used in SBOMs and vulnerability databases and across software supply
