@@ -2,26 +2,26 @@
 
 This is the installation documentation for HealthyCode.
 
-It explains how to deploy HealthyCode four components:
+It explains how to deploy HealthyCode's three components:
 - PurlDB frontend
 - ScanCode.io worker with its health pipeline and HealthyCode
 - GrimoireLab backend
 
-The sequence is to install GrimoireLab, then ScanCode.io and then PurlDB.
-The installation assume that we have a Linux installation (Ubuntu or Debian)
+The sequence is to install GrimoireLab, then ScanCode.io, and then PurlDB.
+The installation assumes a Linux installation (Ubuntu or Debian)
 with these packages:
- - git
- - docker and docker compose
- - build essentials
+ - `git`
+ - `docker` and `docker compose`
+ - `build-essential`
  
 The machine should have at least 32GB RAM (more is better), and about 500GB
-for the base installation. For on-going production, more disk space is required
+for the base installation. For ongoing production, more disk space is required
 in order to keep git clones of all the tracked open source projects.
 
 
 ## GrimoireLab installation
 
-This is deployed using the docker compose at:
+This is deployed using `docker compose` at:
 docker-compose/docker-compose-grimoirelab2.yml
 
 
@@ -61,40 +61,39 @@ and set the credentials as suggested in following steps.
 
 ### Ports and networks
 
-The main GrimoireLab services needed from outside its docker compose network
-are `grimoirelab_core`, served by `nginx` on port 8000` by default and `opensearch`
+The main GrimoireLab services needed from outside its Docker Compose network
+are `grimoirelab_core`, served by `nginx` on port `8000` by default and `opensearch`
 served on port `9200` by default. Both of the two services are included in a
-docker network named `grimoirelab_shared`, and they will be reachable using
-these endpoints from inside the docker network:
+Docker network named `grimoirelab_shared`, and they will be reachable using
+these endpoints from inside the Docker network:
 
  - Web server for the GrimoireLab API: http://grimoirelab-nginx:8000/
  - OpenSearch endpoint: https://grimoirelab-opensearch:9200/
 
 ### GrimoireLab credentials and authentication
 
-By default healthycode installation does not expose the bulk of GrimoireLab
-services outside of the docker network, and therefore we need limited password
-on each instance including OpenSearch. ScanCode.io access these through the
-private docker network.
+By default HealthyCode installation does not expose the bulk of GrimoireLab
+services outside of the Docker network, so only limited password protection is needed, including for OpenSearch. ScanCode.io accesses these through the
+private Docker network.
 
-There are provisions to set passwords on the various services if needed but
+There are provisions to set passwords on the various services if needed but they
 are minimally documented here.
 
-This various values for credentials are configured using environment variables
-and defaults in docker compose file at:
+The values for credentials are configured using environment variables
+and defaults in Docker Compose file at:
 `/opt/healthycode/deploy/docker-compose/docker-compose-grimoirelab2.yml`
 
 You can update that file as needed.
 
-#### OpenSearch (aka. archivist)
+#### OpenSearch (archivist storage)
 
 The GrimoireLab events are stored in OpenSearch cluster.
 
 The credentials for the `admin` user are set with the password variable
 `OPENSEARCH_INITIAL_ADMIN_PASSWORD`.
 
-Note that OpenSearch demands a string passwords and will not start up unless
-the password is strong. These OpenSearch credentials are the ones needed by the 
+OpenSearch requires a strong passwords and will not start without one.
+These OpenSearch credentials are needed by the 
 `grimoirelab_core_archivists` component. The user is `admin` and the password
 is the same you set for OpenSearch:
 
@@ -104,14 +103,14 @@ is the same you set for OpenSearch:
 #### Scheduler
 
 Set the credentials for the GrimoireLab scheduler and its API. This component is
-used by healthycode  to schedule the data collection. Set the following
+used by HealthyCode to schedule the data collection. Set the following
  variables for the scheduler: 
 
   - `GRIMOIRELAB_SUPERUSER_USERNAME`
   - `GRIMOIRELAB_SUPERUSER_PASSWORD`
 
-This uses two containers (`valkey` and `maria_db`) that are accessed with
-empty credentials through the docker network only.
+This uses two containers (`valkey` and `mariadb`) that are accessed with
+empty credentials through the Docker network only.
 
 NOTE that this is not a good practice for production services, yet only
 containers inside this compose project can reach them. 
@@ -128,7 +127,7 @@ production environment:
 
 ## GrimoireLab Startup
 
-Once the initial configuration above is completed, the next step if launch the
+Once the initial configuration above is completed, the next step is to launch the
 containers with these commands, from a clone of this repository:
 
 
@@ -176,7 +175,7 @@ sudo docker compose -f /opt/purldb/docker-compose.yml up -d
 Once completed, make sure that PurlDB is up and running.
 
 
-### Setup  ScanCode.io as a PurlDB scan worker
+### Setup ScanCode.io as a PurlDB scan worker
 
 ```
 git clone https://github.com/aboutcode-org/scancode.io.git /opt/scancodeio/ && cd /opt/scancodeio/
@@ -202,7 +201,7 @@ one server:
 
 ```
 PURLDB_URL=<your host>
-PURLDB_API_KEY="scancode-worker-api-key"
+PURLDB_API_KEY="your-api-key"
 ```
 
 
@@ -268,18 +267,18 @@ NGINX_PUBLISHED_HTTP_PORT=8081
 NGINX_PUBLISHED_HTTPS_PORT=8443
 ```
 
-If this is enabled ScanCode.io will be accessible at: `http://<your host>:8443`
+If this is enabled, ScanCode.io will be accessible at: `https://<your host>:8443`
 
 
 #### Start ScanCode.io
 
-Remove any old healthycode volume.
+Remove any old HealthyCode volume.
 
 ```
 docker volume rm scancodeio_healthycode_venv
 ```
 
-Pull prebuilt ScanCode docker images
+Pull prebuilt ScanCode Docker images
 
 ```
 sudo docker compose -f /opt/scancodeio/docker-compose.purldb-scan-worker.yml pull
