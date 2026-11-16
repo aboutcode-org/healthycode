@@ -1,5 +1,0 @@
-sphinx
-sphinx-rtd-theme
-sphinx-rtd-dark-mode
-sphinx-copybutton
-doc8
